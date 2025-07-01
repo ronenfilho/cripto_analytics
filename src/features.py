@@ -20,9 +20,12 @@ def calculate_summary_statistics(data: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame com as medidas resumo e de dispersão agrupadas por 'symbol' ou para o símbolo informado.
     """
+
+    print('\n')
     print('#################################################################')
-    print(f"Cálculo de medidas resumo e de dispersão para as criptomoedas.")  
+    print(f"Obter medidas resumo e medidas de dispersão.")  
     print('#################################################################')  
+    print('\n')
 
     grouped_stats = data.groupby('symbol')['close'].describe()
     return grouped_stats
@@ -36,10 +39,12 @@ def generate_visualizations(data: pd.DataFrame):
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
     """
 
+    print('\n')
     print('#################################################################')
-    print(f"Geração de boxplots e histogramas dos preços de fechamento.")
+    print(f"Construir boxplot e/ou histograma do preço de fechamento.")
     print('#################################################################')
-    
+    print('\n')
+
     symbols = data['symbol'].unique()
 
     # Garante que a pasta 'figures' existe
@@ -99,14 +104,17 @@ def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: DataFrame com a variabilidade (desvio padrão) de cada moeda.
     """
 
+    print('\n')
     print('#################################################################')
     print(f"Analisar a variabilidade entre as criptomoedas com base nas medidas de dispersão.")
     print('#################################################################')
+    print('\n')
 
     variability = data.groupby('symbol')['close'].std().reset_index()
     variability.columns = ['symbol', 'variability']
     return variability
 
+@timing
 def plot_variability(data: pd.DataFrame):
     """
     Cria e salva um gráfico de barras com a análise da variabilidade entre as criptomoedas.
@@ -131,6 +139,7 @@ def plot_variability(data: pd.DataFrame):
     plt.savefig("figures/variability_analysis_log.png", dpi=150)
     plt.close()
 
+@timing
 def plot_normalized_variability(data: pd.DataFrame):
     """
     Cria e salva um gráfico de barras com a variabilidade normalizada e anotações.
@@ -163,12 +172,72 @@ def plot_normalized_variability(data: pd.DataFrame):
     plt.savefig("figures/variability_analysis_normalized.png", dpi=150)
     plt.close()
 
+@timing
+def plot_price_trends_by_month_year(data: pd.DataFrame):
+    """
+    Cria e salva gráficos de linha por símbolo agrupados por mês e ano com o preço de fechamento destacando média, mediana e moda.
+
+    Args:
+        data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
+    """
+
+    print('\n')
+    print('#################################################################')
+    print(f"Construir gráfico de linha com o preço de fechamento destacando a média, mediana e moda ao longo do tempo.")
+    print('#################################################################')
+    print('\n')
+
+    # Garante que a pasta 'figures' existe
+    os.makedirs('figures', exist_ok=True)
+
+    # Converte a coluna 'date' para datetime
+    data['date'] = pd.to_datetime(data['date'])
+
+    # Agrupa por mês e ano
+    data['month_year'] = data['date'].dt.to_period('M')
+
+    symbols = data['symbol'].unique()
+
+    for symbol in symbols:
+        symbol_data = data[data['symbol'] == symbol]
+
+        # Calcula média, mediana, moda e preço de fechamento por mês/ano
+        grouped_data = symbol_data.groupby('month_year')['close'].agg(['mean', 'median', lambda x: x.mode()[0] if not x.mode().empty else None, 'last']).reset_index()
+        grouped_data.columns = ['month_year', 'mean', 'median', 'mode', 'close']
+
+        # Substitui '/' por '_' no nome do símbolo
+        sanitized_symbol = symbol.replace('/', '_')
+
+        # Gráfico de linha incluindo preço de fechamento
+        plt.figure(figsize=(16, 10))
+        plt.plot(grouped_data['month_year'].astype(str), grouped_data['mean'], label='Média', color='green', linestyle='--')
+        plt.plot(grouped_data['month_year'].astype(str), grouped_data['median'], label='Mediana', color='orange', linestyle='--')
+        plt.plot(grouped_data['month_year'].astype(str), grouped_data['mode'], label='Moda', color='red', linestyle='--')
+        plt.plot(grouped_data['month_year'].astype(str), grouped_data['close'], label='Preço de Fechamento', color='blue')
+
+        plt.title(f"Tendências de Preço de Fechamento por Mês/Ano - {symbol}")
+        plt.xlabel("Mês/Ano")
+        plt.ylabel("Preço de Fechamento")
+        plt.legend()
+        plt.xticks(rotation=45, ha='right')  # Ajusta os rótulos para evitar sobreposição
+
+        # Ajusta os rótulos do eixo X para exibir apenas alguns labels de mês/ano, espaçando-os.
+        xticks = grouped_data['month_year'].astype(str)
+        plt.xticks(ticks=range(0, len(xticks), max(1, len(xticks) // 10)), labels=xticks[::max(1, len(xticks) // 10)], rotation=45, ha='right')
+
+        # Adiciona linhas horizontais aos gráficos
+        plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+        plt.tight_layout()
+        plt.savefig(f"figures/{sanitized_symbol}_price_trends_month_year.png", dpi=150)
+        plt.close()
+
 if __name__ == "__main__":
     data = pd.read_csv(PROCESSED_FILE)
 
-    symbols = []
+    symbols = []    
+    #symbols = ['BTC/USDT', 'ETH/USDT']
     #symbols = ['BTC/USDT']
-    #symbols = ['BTC/USDT', 'ETH/USDT']    
 
     print(f"Símbolo: {symbols if symbols else 'Todos'}")
 
@@ -193,3 +262,7 @@ if __name__ == "__main__":
     # Gera e salva o gráfico de variabilidade normalizada
     plot_normalized_variability(filtered_data)
     print("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
+
+    # Gera e salva gráficos de tendências de preço por mês/ano
+    plot_price_trends_by_month_year(filtered_data)
+    print("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
