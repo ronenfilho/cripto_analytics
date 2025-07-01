@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 from pathlib import Path
 
 
@@ -9,8 +9,6 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 
 # Diretório raiz
 ROOT_DIR = Path(__file__).resolve().parent.parent
-
-print(f"Diretório raiz: {ROOT_DIR}")
 
 # Diretórios de dados
 DATASET_DIR = ROOT_DIR / 'data'
