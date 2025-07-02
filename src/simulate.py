@@ -13,7 +13,7 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import PROCESSED_FILE, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, USE_POLYNOMIAL_REGRESSION, SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
+from src.config import PROCESSED_FILE, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
 from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime
 
 '''
@@ -99,11 +99,14 @@ def k_fold_validation(model, X, y, n_splits=5):
     return np.mean(mse_scores)
 
 @timing
-def walk_forward_prediction(model, X, y, min_train_size=365):
+def _walk_forward_prediction(model, X, y, min_train_size=30):
     """
     Gera previsões cronológicas usando a abordagem Walk-Forward (janela expansível).
     Retorna uma série contínua de previsões feitas apenas com dados passados.
     """
+
+    predictions = []
+
     n_splits = len(X) - min_train_size
     tscv = TimeSeriesSplit(n_splits=n_splits, test_size=1)
     
@@ -116,7 +119,82 @@ def walk_forward_prediction(model, X, y, min_train_size=365):
         return model_clone.predict(X_test)[0]
     
     predictions = np.array([train_and_predict(indices) for indices in tscv.split(X)])
+
     return predictions
+
+@timing
+def walk_forward_prediction(model, X, y, min_train_size=30):
+    """
+    Gera previsões cronológicas usando a abordagem Walk-Forward (janela expansível),
+    com logging de progresso.
+    """
+    # Inicializa a lista para armazenar as previsões
+    predictions = []
+
+    # Configura o TimeSeriesSplit para o loop de validação
+    n_splits = len(X) - min_train_size
+    tscv = TimeSeriesSplit(n_splits=n_splits, test_size=1)
+    
+    print(f"Iniciando predição Walk-Forward para {model.__class__.__name__}...")
+
+    # Inicializa o saldo acumulado fora do loop
+    accumulated_balance = INITIAL_CAPITAL
+
+    # Loop explícito para permitir futura adição de logging ou outras operações
+    for i, (train_index, test_index) in enumerate(tscv.split(X)):
+        # Clona o modelo para garantir que não haja vazamento de estado
+        model_clone = clone(model)
+        
+        # Separa os dados de treino e teste para a iteração atual
+        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+        y_train = y.iloc[train_index]
+        
+        # Treina o modelo com os dados históricos até o momento
+        model_clone.fit(X_train, y_train)
+        
+        # Faz a previsão para o próximo dia e a armazena
+        pred = model_clone.predict(X_test)[0]
+        predictions.append(pred)
+        
+        # Verifica se a previsão indica compra (previsão maior que o preço atual)
+        current_price = y.iloc[test_index[0]]
+        action = "Compra realizada" if pred > current_price else "Sem compra"
+        
+        # Calcula o saldo acumulado (simulação simples)
+        if i == 0:
+            accumulated_balance = INITIAL_CAPITAL
+        else:
+            previous_price = y.iloc[test_index[0] - 1]
+            accumulated_balance *= (current_price / previous_price) if action == "Compra realizada" else 1
+        
+        # Imprime o status do progresso a cada 1 dia ou no último dia
+        #if (i + 1) % 1 == 0 or (i + 1) == n_splits:
+        # (Removido: cálculo de porcentagem de acerto/erro dentro do loop)
+
+    # Calcula a porcentagem de erro e acerto após o loop
+    correct_predictions = 0
+    total_predictions = 0
+    total_buys = 0
+    y_true = y.iloc[min_train_size:].values
+    preds = np.array(predictions)
+    correct_predictions = np.sum((y_true[:-1] < y_true[1:]) == (preds[:-1] < preds[1:]))
+    total_predictions = len(preds) - 1
+    if total_predictions > 0:
+        accuracy_percentage = (correct_predictions / total_predictions) * 100
+        error_percentage = 100 - accuracy_percentage
+    else:
+        accuracy_percentage = 0
+        error_percentage = 100
+    total_days = len(predictions)
+    y_future = y.iloc[min_train_size:min_train_size + total_days].values
+    total_buys = np.sum(np.array(predictions) > y_future)
+
+    print(f"\nPorcentagem de acerto: {accuracy_percentage:.2f}%")
+    print(f"Porcentagem de erro: {error_percentage:.2f}%")
+    print(f"Total de compras sugeridas: {total_buys}/{total_days} dias")
+
+    # Retorna o array de previsões
+    return np.array(predictions)
 
 @timing
 def simulate_returns(y_test: pd.Series, y_pred: np.ndarray, initial_capital: float = 1000.0) -> list:
@@ -136,7 +214,7 @@ def simulate_returns(y_test: pd.Series, y_pred: np.ndarray, initial_capital: flo
 def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, models: dict, initial_capital: float = 1000.0, test_period_days: int = 365):
     """
     Executa o fluxo completo de simulação de investimento para um ativo e plota o resultado.
-    Simula os últimos 365 dias.
+    Simula os últimos 'test_period_days' dias.
     """
     print("\n" + "#"*60)
     print(f"PARTE 2: SIMULAÇÃO DE INVESTIMENTO PARA {symbol_to_simulate}")
@@ -208,7 +286,7 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     # Ajusta o tamanho de 'dates_test_sim' para coincidir com 'capital_evolution'
     dates_test_sim = dates_test_sim[:len(capital_evolution)]
 
-    # Ajusta 'capital_evolution' para garantir que tenha exatamente 365 elementos
+    # Ajusta 'capital_evolution' para garantir que tenha a quantidade informada de elementos
     if len(capital_evolution) < len(dates_test_sim):
         missing_elements = len(dates_test_sim) - len(capital_evolution)
         capital_evolution = np.append(capital_evolution, [capital_evolution[-1]] * missing_elements)
@@ -225,7 +303,6 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     # - Compara o preço previsto com o preço real para simular decisões de compra/venda.
     # - Evolução do capital depende da precisão das previsões.
 
-    # Resumo via print
     print("\n")
     print("#################################################################")
     print("Diferença entre Buy and Hold e Modelos (MLP, etc.):")
@@ -239,6 +316,7 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     print(" - Usa previsões para ajustar posições diariamente.")
     print(" - Evolução depende da precisão das previsões.")
     print("\n")
+
     # Adiciona explicação sobre o cálculo do lucro com o modelo
     print("\n")
     print("#################################################################")
@@ -255,10 +333,8 @@ def run_training_data():
     """
     Executa o fluxo completo de treinamento e validação dos modelos.
     """
-
-    #symbols = []    
+    
     symbols = SYMBOLS
-    #symbols = ['BTC/USDT']
 
     try:
         data = pd.read_csv(PROCESSED_FILE)
@@ -282,7 +358,6 @@ def run_training_data():
 
     # Calcula features
     data_calculate = calculate_features(filtered_data)
-    #print(f"Features calculadas:\n{data_calculate[['date', 'symbol', 'close', 'mean_7d', 'std_7d']].head()}")
 
     # Remove linhas com valores ausentes
     features_to_check = ['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']
@@ -302,15 +377,11 @@ def run_training_data():
         if name == "LinearRegression":
             models[name] = LinearRegression()
         elif name == "MLPRegressor":
-            models[name] = MLPRegressor(hidden_layer_sizes=(50,), max_iter=400, random_state=42)  # Reduzido de (100, 50) e 500 iterações            
-
-    poly_degree_range = range(int(POLYNOMIAL_DEGREE_RANGE[0]), int(POLYNOMIAL_DEGREE_RANGE[1]) + 1)
-
-    if USE_POLYNOMIAL_REGRESSION:
-        from sklearn.pipeline import make_pipeline
-        from sklearn.preprocessing import PolynomialFeatures
-        for degree in poly_degree_range:
-            models[f"PolynomialRegression_degree_{degree}"] = make_pipeline(PolynomialFeatures(degree), LinearRegression())
+            models[name] = MLPRegressor(hidden_layer_sizes=(50,), max_iter=400, random_state=42)
+        elif name == "PolynomialRegression":
+            poly_degree_range = range(int(POLYNOMIAL_DEGREE_RANGE[0]), int(POLYNOMIAL_DEGREE_RANGE[1]) + 1)
+            for degree in poly_degree_range:
+                models[f"PolynomialRegression_degree_{degree}"] = make_pipeline(PolynomialFeatures(degree), LinearRegression())
 
     results = []
 
@@ -431,11 +502,8 @@ if __name__ == "__main__":
     y = data['close']
 
     # --- PARTE 2: Chamada para a Simulação de Investimento ---
-    # Atualiza para usar valores do .env para symbol_to_simulate e initial_capital
-    symbol_to_simulate = SYMBOL_TO_SIMULATE
-    initial_capital = INITIAL_CAPITAL
-
-    run_investment_simulation(data=data, symbol_to_simulate=symbol_to_simulate, models=models, initial_capital=initial_capital, test_period_days=TEST_PERIOD_DAYS)
+    print("\n")
+    run_investment_simulation(data=data, symbol_to_simulate=SYMBOL_TO_SIMULATE, models=models, initial_capital=INITIAL_CAPITAL, test_period_days=TEST_PERIOD_DAYS)
 
     # --- PARTE 3: Análise dos Modelos ---
     print("\n")

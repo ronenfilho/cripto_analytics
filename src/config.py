@@ -28,13 +28,24 @@ SYMBOLS = os.getenv("SYMBOLS", "BTC/USDT").split(',')
 MODELS = {
     "LinearRegression": os.getenv("USE_LINEAR_REGRESSION", "True").lower() == "true",
     "MLPRegressor": os.getenv("USE_MLP_REGRESSOR", "True").lower() == "true",
+    "PolynomialRegression": os.getenv("USE_POLYNOMIAL_REGRESSION", "True").lower() == "true",
+    #"DecisionTreeRegressor": os.getenv("USE_DECISION_TREE_REGRESSOR", "True").lower() == "true",
+    #"RandomForestRegressor": os.getenv("USE_RANDOM_FOREST_REGRESSOR", "True").lower() == "true",
+    #"XGBRegressor": os.getenv("USE_XGB_REGRESSOR", "True").lower() == "true",
+    #"CatBoostRegressor": os.getenv("USE_CATBOOST_REGRESSOR", "True").lower() == "true",
+    #"LightGBMRegressor": os.getenv("USE_LIGHTGBM_REGRESSOR", "True").lower() == "true",
+    #"AdaBoostRegressor": os.getenv("USE_ADA_BOOST_REGRESSOR", "True").lower() == "true",
+    #"GradientBoostingRegressor": os.getenv("USE_GRADIENT_BOOSTING_REGRESSOR", "True").lower() == "true",        
 }
+
+# Define se o modelo PolynomialRegression será utilizado com base no .env
+#USE_POLYNOMIAL_REGRESSION = str(os.getenv("USE_POLYNOMIAL_REGRESSION", "True")).lower() == "true"
 
 # Atualiza para suportar intervalo de graus para PolynomialRegression
 POLYNOMIAL_DEGREE_RANGE = os.getenv("POLYNOMIAL_DEGREE_RANGE", "2,5").split(',')
 
-USE_POLYNOMIAL_REGRESSION = str(os.getenv("USE_POLYNOMIAL_REGRESSION", "True")).lower() == "true"
-
+# Define o símbolo específico para simulação com base no .env
 SYMBOL_TO_SIMULATE = os.getenv("SYMBOL_TO_SIMULATE", "BTC/USDT")
 
+# Define o capital inicial para simulação com base no .env
 INITIAL_CAPITAL = float(os.getenv("INITIAL_CAPITAL", "1000.0"))
