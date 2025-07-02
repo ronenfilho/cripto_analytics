@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import KFold, TimeSeriesSplit
-from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.base import clone
@@ -9,12 +8,13 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
+from sklearn.metrics import mean_squared_error
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import PROCESSED_FILE, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
-from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients
+from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients, calculate_standard_error_between_mlp_and_best, determine_best_equation, calculate_standard_error
 
 '''
 Análise de Performance (com K-Fold): Manteremos sua validação K-Fold original para gerar a tabela de RMSE e provar a performance geral dos modelos.
@@ -401,58 +401,6 @@ def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
     
     #plt.show()
     plt.close()
-
-def determine_best_equation(models, X, y):
-    """
-    Determina a equação que melhor representa os regressores.
-    """
-    best_model = None
-    best_score = float('-inf')
-    for name, model in models.items():
-        model_clone = clone(model)
-        model_clone.fit(X, y)
-        score = model_clone.score(X, y)
-        if score > best_score:
-            best_score = score
-            best_model = name
-    return best_model, best_score
-
-
-def calculate_standard_error(models, X, y):
-    """
-    Calcula o erro padrão para todos os modelos.
-    """
-    errors = {}
-    for name, model in models.items():
-        model_clone = clone(model)
-        model_clone.fit(X, y)
-        y_pred = model_clone.predict(X)
-        error = np.sqrt(mean_squared_error(y, y_pred))
-        errors[name] = error
-    return errors
-
-
-def calculate_standard_error_between_mlp_and_best(models, X, y):
-    """
-    Calcula o erro padrão entre o MLP e o melhor regressor.
-    """
-    mlp_model = models.get('MLPRegressor')
-    best_model_name, _ = determine_best_equation(models, X, y)
-    best_model = models.get(best_model_name)
-
-    mlp_clone = clone(mlp_model)
-    best_clone = clone(best_model)
-
-    mlp_clone.fit(X, y)
-    best_clone.fit(X, y)
-
-    y_pred_mlp = mlp_clone.predict(X)
-    y_pred_best = best_clone.predict(X)
-
-    if np.array_equal(y_pred_mlp, y_pred_best):
-        print("Aviso: As previsões do MLP e do melhor modelo são idênticas, resultando em erro padrão 0.0.")
-    error = np.sqrt(mean_squared_error(y_pred_mlp, y_pred_best))
-    return error
 
 if __name__ == "__main__":
     # --- PARTE 1: Treinamento e Validação dos Modelos ---

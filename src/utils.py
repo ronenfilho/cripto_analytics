@@ -6,9 +6,64 @@ import datetime
 import sys
 import numpy as np
 from sklearn.base import clone
+from sklearn.metrics import mean_squared_error
+
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import USE_TIMING
+
+def determine_best_equation(models, X, y):
+    """
+    Determina a equação que melhor representa os regressores.
+    """
+    best_model = None
+    best_score = float('-inf')
+    for name, model in models.items():
+        model_clone = clone(model)
+        model_clone.fit(X, y)
+        score = model_clone.score(X, y)
+        if score > best_score:
+            best_score = score
+            best_model = name
+    return best_model, best_score
+
+
+def calculate_standard_error(models, X, y):
+    """
+    Calcula o erro padrão para todos os modelos.
+    """
+    errors = {}
+    for name, model in models.items():
+        model_clone = clone(model)
+        model_clone.fit(X, y)
+        y_pred = model_clone.predict(X)
+        error = np.sqrt(mean_squared_error(y, y_pred))
+        errors[name] = error
+    return errors
+
+
+def calculate_standard_error_between_mlp_and_best(models, X, y):
+    """
+    Calcula o erro padrão entre o MLP e o melhor regressor.
+    """
+    mlp_model = models.get('MLPRegressor')
+    best_model_name, _ = determine_best_equation(models, X, y)
+    best_model = models.get(best_model_name)
+
+    mlp_clone = clone(mlp_model)
+    best_clone = clone(best_model)
+
+    mlp_clone.fit(X, y)
+    best_clone.fit(X, y)
+
+    y_pred_mlp = mlp_clone.predict(X)
+    y_pred_best = best_clone.predict(X)
+
+    if np.array_equal(y_pred_mlp, y_pred_best):
+        print("Aviso: As previsões do MLP e do melhor modelo são idênticas, resultando em erro padrão 0.0.")
+    error = np.sqrt(mean_squared_error(y_pred_mlp, y_pred_best))
+    return error
+
 
 def calculate_correlation_coefficients(models, X, y):
     """
