@@ -1,15 +1,29 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
+from sklearn.base import clone
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
 import os
+from dotenv import load_dotenv
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import PROCESSED_FILE
-from src.utils import timing, filter_symbols
+from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime
+
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
+
+# Define a quantidade de dias da simulação com base no .env
+TEST_PERIOD_DAYS = int(os.getenv("TEST_PERIOD_DAYS", "30"))
+
+SYMBOLS = os.getenv("SYMBOLS", "").split(',')
 
 '''
 Análise de Performance (com K-Fold): Manteremos sua validação K-Fold original para gerar a tabela de RMSE e provar a performance geral dos modelos.
@@ -22,6 +36,7 @@ E assim por diante...
 Isso garante que cada previsão seja feita usando apenas dados do passado, simulando perfeitamente um ambiente real.
 '''
 
+@timing
 def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
     """
     Calcula features baseadas em séries temporais para previsão de preços.
@@ -72,40 +87,202 @@ def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
 
     return data
 
-
+@timing
 def k_fold_validation(model, X, y, n_splits=5):
     """
     Aplica validação K-Fold ao modelo e retorna MSE médio.
-    
-    Args:
-        model: Estimador scikit-learn.
-        X (pd.DataFrame): Features.
-        y (pd.Series): Alvo.
-        n_splits (int): Número de folds.
-
-    Returns:
-        float: Erro médio quadrático médio.
     """
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     mse_scores = []
 
     for train_index, test_index in kf.split(X):
+        model_clone = clone(model)
+        
         X_train, X_test = X.iloc[train_index], X.iloc[test_index]
         y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
-        model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
+        model_clone.fit(X_train, y_train)
+        y_pred = model_clone.predict(X_test)
         mse_scores.append(mean_squared_error(y_test, y_pred))
 
     return np.mean(mse_scores)
 
+@timing
+def walk_forward_prediction(model, X, y, min_train_size=365):
+    """
+    Gera previsões cronológicas usando a abordagem Walk-Forward (janela expansível).
+    Retorna uma série contínua de previsões feitas apenas com dados passados.
+    """
+    n_splits = len(X) - min_train_size
+    tscv = TimeSeriesSplit(n_splits=n_splits, test_size=1)
+    
+    def train_and_predict(indices):
+        train_index, test_index = indices
+        model_clone = clone(model)
+        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+        y_train = y.iloc[train_index]
+        model_clone.fit(X_train, y_train)
+        return model_clone.predict(X_test)[0]
+    
+    predictions = np.array([train_and_predict(indices) for indices in tscv.split(X)])
+    return predictions
 
-if __name__ == "__main__":
-    data = pd.read_csv(PROCESSED_FILE)
+@timing
+def simulate_returns(y_test: pd.Series, y_pred: np.ndarray, initial_capital: float = 1000.0) -> list:
+    """Simula os retornos de uma estratégia de investimento."""
 
-    symbols = []    
-    #symbols = ['BTC/USDT', 'ETH/USDT']
+    capital = initial_capital
+    capital_evolution = [initial_capital]
+    y_test_values = y_test.values
+
+    # Ajusta o cálculo de capital_evolution para incluir o capital inicial
+    daily_returns = np.where(y_pred[1:] > y_test_values[:-1], y_test_values[1:] / y_test_values[:-1], 1)
+    capital_evolution = np.concatenate(([initial_capital], initial_capital * np.cumprod(daily_returns)))
+
+    return capital_evolution.tolist()
+
+@timing
+def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, models: dict, initial_capital: float = 1000.0, test_period_days: int = 365):
+    """
+    Executa o fluxo completo de simulação de investimento para um ativo e plota o resultado.
+    Simula os últimos 365 dias.
+    """
+    print("\n" + "#"*60)
+    print(f"PARTE 2: SIMULAÇÃO DE INVESTIMENTO PARA {symbol_to_simulate}")
+    print("#"*60)
+
+    single_symbol_data = filter_symbols(data, [symbol_to_simulate])
+    
+    # Garante que os dados estão ordenados por data em ordem crescente
+    single_symbol_data['date'] = pd.to_datetime(single_symbol_data['date'])
+    single_symbol_data = single_symbol_data.sort_values('date', ascending=True)
+    
+    data_with_features = calculate_features(single_symbol_data)
+    data_processed = data_with_features.dropna()
+
+    features_cols = ['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']
+    X_sim = data_processed[features_cols]
+    y_sim = data_processed['close']
+    dates_sim = pd.to_datetime(data_processed['date'])
+    
+    min_train_size = len(X_sim) - test_period_days
+    if min_train_size < 100:
+        print("Erro: Não há dados suficientes para uma simulação com o período de teste solicitado.")
+        return
+
+    y_test_sim = y_sim.iloc[min_train_size:]
+    dates_test_sim = dates_sim.iloc[min_train_size:]
+
+    # Ordena por data para garantir ordem cronológica correta
+    sorted_idx = np.argsort(dates_test_sim.values)
+    dates_test_sim = dates_test_sim.iloc[sorted_idx]
+    y_test_sim = y_test_sim.iloc[sorted_idx]
+
+    plt.style.use('seaborn-v0_8-darkgrid')
+    fig, ax = plt.subplots(figsize=(14, 8))
+    
+    for name, model in models.items():
+        y_pred_walk_forward = walk_forward_prediction(model, X_sim, y_sim, min_train_size)
+        y_pred_walk_forward = np.array(y_pred_walk_forward)[sorted_idx]
+        capital_evolution = simulate_returns(y_test_sim, y_pred_walk_forward, initial_capital)
+        ax.plot(dates_test_sim, capital_evolution, label=f'Estratégia {name}')
+        print(f"Capital final com {name}: U${capital_evolution[-1]:.2f}")
+
+    # Estratégia "Buy and Hold"
+    y_test_values = y_test_sim.values
+    hold_evolution = [initial_capital * (price / y_test_values[0]) for price in y_test_values]
+    ax.plot(dates_test_sim, hold_evolution, label='Estratégia Buy and Hold', linestyle='--')
+    print(f"Capital final com Buy and Hold: U${hold_evolution[-1]:.2f}")
+
+    # Configurações do Gráfico
+    ax.set_title(f'Evolução do Capital - Simulação Walk-Forward ({symbol_to_simulate})', fontsize=16)
+    ax.set_xlabel('Data', fontsize=12)
+    ax.set_ylabel('Capital Acumulado (U$)', fontsize=12)
+    ax.legend(fontsize=10)
+    formatter = mticker.FormatStrFormatter('U$%.0f')
+    ax.yaxis.set_major_formatter(formatter)
+    fig.autofmt_xdate()
+
+    # Garante que a pasta 'figures' existe
+    os.makedirs('figures', exist_ok=True)
+
+    file_name = f"{get_current_datetime()}_{sanitize_symbol(symbol_to_simulate)}_investment_simulation_{test_period_days}_days.png"
+
+    # Salva o gráfico na pasta figures antes de mostrar
+    plt.savefig(f"figures/{file_name}", dpi=150, bbox_inches='tight')
+    
+    plt.show()
+    plt.close()
+
+    # Ajusta o tamanho de 'dates_test_sim' para coincidir com 'capital_evolution'
+    dates_test_sim = dates_test_sim[:len(capital_evolution)]
+
+    # Ajusta 'capital_evolution' para garantir que tenha exatamente 365 elementos
+    if len(capital_evolution) < len(dates_test_sim):
+        missing_elements = len(dates_test_sim) - len(capital_evolution)
+        capital_evolution = np.append(capital_evolution, [capital_evolution[-1]] * missing_elements)
+
+    # Documentação: Diferença entre Buy and Hold e Modelos (MLP, etc.)
+    #
+    # Estratégia "Buy and Hold":
+    # - Assume que o investidor compra o ativo no início do período e mantém até o final.
+    # - Não realiza ajustes baseados em previsões.
+    # - Evolução do capital é proporcional ao preço do ativo ao longo do tempo.
+    #
+    # Estratégia com Modelos (MLP, etc.):
+    # - Usa previsões feitas pelo modelo para decidir ajustes diários.
+    # - Compara o preço previsto com o preço real para simular decisões de compra/venda.
+    # - Evolução do capital depende da precisão das previsões.
+
+    # Resumo via print
+    print("\n")
+    print("#################################################################")
+    print("Diferença entre Buy and Hold e Modelos (MLP, etc.):")
+    print("#################################################################")
+    print("\n")
+    print("Buy and Hold:")
+    print(" - Compra no início e mantém até o final.")
+    print(" - Evolução proporcional ao preço inicial e final.")
+    print("\n")
+    print("Modelos (MLP, etc.):")
+    print(" - Usa previsões para ajustar posições diariamente.")
+    print(" - Evolução depende da precisão das previsões.")
+    print("\n")
+    # Adiciona explicação sobre o cálculo do lucro com o modelo
+    print("\n")
+    print("#################################################################")
+    print("Computar o lucro obtido com seu modelo:")
+    print("#################################################################")
+    print("\n")
+    print("Caso tenha investido U$ 1,000.00 no primeiro dia de operação:")
+    print(" - Refazendo investimentos de todo o saldo acumulado diariamente.")
+    print(" - Apenas se a previsão do valor de fechamento do próximo dia for superior ao do dia atual.")
+    print("\n")
+
+@timing
+def run_training_data():
+    """
+    Executa o fluxo completo de treinamento e validação dos modelos.
+    """
+
+    #symbols = []    
+    symbols = SYMBOLS
     #symbols = ['BTC/USDT']
+
+    try:
+        data = pd.read_csv(PROCESSED_FILE)
+    except FileNotFoundError:
+        print(f"Erro: Arquivo não encontrado em '{PROCESSED_FILE}'. Ajuste a variável no script.")
+        sys.exit(1)
+
+    # --- PARTE 1: Análise de Performance com K-Fold ---
+    print('\n')
+    print('#################################################################')
+    print("PARTE 1: Análise de Performance com K-Fold (Legenda):")
+    print('#################################################################')    
+    print(f" - Erro médio quadrático (MSE)")
+    print(f" - Raiz do erro médio quadrático (RMSE)")    
+    print('\n')     
 
     print(f"Símbolo: {symbols if symbols else 'Todos'}")
 
@@ -125,26 +302,185 @@ if __name__ == "__main__":
     X = data_calculate[['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']]
     y = data_calculate['close']
 
-    models = {
-        "LinearRegression": LinearRegression(),
-        "MLPRegressor": MLPRegressor(hidden_layer_sizes=(64, 32), max_iter=1000, random_state=42)
+    # Atualiza os modelos ativos com base no .env
+    MODELS = {
+        "LinearRegression": os.getenv("USE_LINEAR_REGRESSION", "True").lower() == "true",
+        "MLPRegressor": os.getenv("USE_MLP_REGRESSOR", "True").lower() == "true",
     }
+
+    # Filtra os modelos ativos
+    active_models = {name: model for name, model in MODELS.items() if model}
+
+    # Cria instâncias dos modelos ativos
+    models = {}
+    for name in active_models.keys():
+        if name == "LinearRegression":
+            models[name] = LinearRegression()
+        elif name == "MLPRegressor":
+            models[name] = MLPRegressor(hidden_layer_sizes=(50,), max_iter=400, random_state=42)  # Reduzido de (100, 50) e 500 iterações            
+
+    # Atualiza para suportar intervalo de graus para PolynomialRegression
+    poly_degree_range = os.getenv("POLYNOMIAL_DEGREE_RANGE", "2,5").split(',')
+    poly_degree_range = range(int(poly_degree_range[0]), int(poly_degree_range[1]) + 1)
+
+    if os.getenv("USE_POLYNOMIAL_REGRESSION", "True").lower() == "true":
+        from sklearn.pipeline import make_pipeline
+        from sklearn.preprocessing import PolynomialFeatures
+        for degree in poly_degree_range:
+            models[f"PolynomialRegression_degree_{degree}"] = make_pipeline(PolynomialFeatures(degree), LinearRegression())
 
     results = []
 
     for name, model in models.items():
         mse = k_fold_validation(model, X, y)
         rmse = np.sqrt(mse)
-        results.append({"Modelo": name, "MSE": mse, "RMSE": rmse})
-
-    print('\n')
-    print('#################################################################')
-    print("Resultados da Validação K-Fold (Legenda):")
-    print('#################################################################')    
-    print(f" - Erro médio quadrático (MSE)")
-    print(f" - Raiz do erro médio quadrático (RMSE)")    
-    print('\n')
+        results.append({"Modelo": name, "MSE": mse, "RMSE": rmse})    
 
     results_df = pd.DataFrame(results)
     print("Comparação de Modelos:")
     print(results_df)
+
+    return models, data_calculate
+
+# Adiciona métodos para análise dos modelos
+
+def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
+    """
+    Gera um diagrama de dispersão para todos os modelos.
+    Salva o gráfico na pasta figures.
+    """
+    plt.style.use('seaborn-v0_8-darkgrid')
+    fig, ax = plt.subplots(figsize=(14, 8))
+
+    for name, model in models.items():
+        model_clone = clone(model)
+        model_clone.fit(X, y)
+        y_pred = model_clone.predict(X)
+        ax.scatter(y, y_pred, label=name, alpha=0.6)
+
+    ax.set_title('Diagrama de Dispersão - Modelos', fontsize=16)
+    ax.set_xlabel('Valores Reais', fontsize=12)
+    ax.set_ylabel('Valores Preditos', fontsize=12)
+    ax.legend(fontsize=10)
+
+    # Atualiza o nome do arquivo para o scatter diagram
+    scatter_file_name = f"{get_current_datetime()}_scatter_diagram.png"
+ 
+    # Salva o gráfico na pasta figures antes de mostrar
+    plt.savefig(f"figures/{scatter_file_name}", dpi=150, bbox_inches='tight')
+    
+    plt.show()
+    plt.close()
+
+
+def calculate_correlation_coefficients(models, X, y):
+    """
+    Calcula os coeficientes de correlação para todos os modelos.
+    """
+    correlations = {}
+    for name, model in models.items():
+        model_clone = clone(model)
+        model_clone.fit(X, y)
+        y_pred = model_clone.predict(X)
+        correlation = np.corrcoef(y, y_pred)[0, 1]
+        correlations[name] = correlation
+    return correlations
+
+
+def determine_best_equation(models, X, y):
+    """
+    Determina a equação que melhor representa os regressores.
+    """
+    best_model = None
+    best_score = float('-inf')
+    for name, model in models.items():
+        model_clone = clone(model)
+        model_clone.fit(X, y)
+        score = model_clone.score(X, y)
+        if score > best_score:
+            best_score = score
+            best_model = name
+    return best_model, best_score
+
+
+def calculate_standard_error(models, X, y):
+    """
+    Calcula o erro padrão para todos os modelos.
+    """
+    errors = {}
+    for name, model in models.items():
+        model_clone = clone(model)
+        model_clone.fit(X, y)
+        y_pred = model_clone.predict(X)
+        error = np.sqrt(mean_squared_error(y, y_pred))
+        errors[name] = error
+    return errors
+
+
+def calculate_standard_error_between_mlp_and_best(models, X, y):
+    """
+    Calcula o erro padrão entre o MLP e o melhor regressor.
+    """
+    mlp_model = models.get('MLPRegressor')
+    best_model_name, _ = determine_best_equation(models, X, y)
+    best_model = models.get(best_model_name)
+
+    mlp_clone = clone(mlp_model)
+    best_clone = clone(best_model)
+
+    mlp_clone.fit(X, y)
+    best_clone.fit(X, y)
+
+    y_pred_mlp = mlp_clone.predict(X)
+    y_pred_best = best_clone.predict(X)
+
+    if np.array_equal(y_pred_mlp, y_pred_best):
+        print("Aviso: As previsões do MLP e do melhor modelo são idênticas, resultando em erro padrão 0.0.")
+    error = np.sqrt(mean_squared_error(y_pred_mlp, y_pred_best))
+    return error
+
+# Ajusta o escopo para garantir que models, X e y sejam definidos antes da chamada dos métodos
+if __name__ == "__main__":
+    # --- PARTE 1: Treinamento e Validação dos Modelos ---
+    models, data = run_training_data()
+
+    # Define X e y para análise
+    X = data[['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']]
+    y = data['close']
+
+    # --- PARTE 2: Chamada para a Simulação de Investimento ---
+    # Atualiza para usar valores do .env para symbol_to_simulate e initial_capital
+    symbol_to_simulate = os.getenv("SYMBOL_TO_SIMULATE", "BTC/USDT")
+    initial_capital = float(os.getenv("INITIAL_CAPITAL", "1000.0"))
+
+    run_investment_simulation(data=data, symbol_to_simulate=symbol_to_simulate, models=models, initial_capital=initial_capital, test_period_days=TEST_PERIOD_DAYS)
+
+    # --- PARTE 3: Análise dos Modelos ---
+    print("\n")
+    print("#################################################################")
+    print("Análise dos Modelos:")
+    print("#################################################################")
+    print("\n")
+
+    # Gera o diagrama de dispersão
+    plot_scatter_diagram(models, X, y)
+
+    # Calcula os coeficientes de correlação
+    correlations = calculate_correlation_coefficients(models, X, y)
+    print("Coeficientes de Correlação:")
+    for name, corr in correlations.items():
+        print(f" - {name}: {corr:.4f}")
+
+    # Determina a melhor equação
+    best_model_name, best_score = determine_best_equation(models, X, y)
+    print(f"Melhor Modelo: {best_model_name} com score {best_score:.4f}")
+
+    # Calcula o erro padrão
+    errors = calculate_standard_error(models, X, y)
+    print("Erro Padrão:")
+    for name, error in errors.items():
+        print(f" - {name}: {error:.4f}")
+
+    # Calcula o erro padrão entre MLP e o melhor regressor
+    error_between_mlp_and_best = calculate_standard_error_between_mlp_and_best(models, X, y)
+    print(f"Erro Padrão entre MLP e {best_model_name}: {error_between_mlp_and_best:.4f}")
