@@ -64,7 +64,6 @@ def calculate_standard_error_between_mlp_and_best(models, X, y):
     error = np.sqrt(mean_squared_error(y_pred_mlp, y_pred_best))
     return error
 
-
 def calculate_correlation_coefficients(models, X, y):
     """
     Calcula os coeficientes de correlação para todos os modelos.
