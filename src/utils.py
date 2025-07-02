@@ -3,19 +3,26 @@ import functools
 import pandas as pd
 import os
 import datetime
+import sys
+import numpy as np
+from sklearn.base import clone
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from src.config import USE_TIMING
 
-# Ajusta o import para garantir que o dotenv seja resolvido corretamente
-try:
-    from dotenv import load_dotenv
-except ImportError:
-    raise ImportError("O pacote 'python-dotenv' não está acessível. Certifique-se de que está instalado corretamente.")
+def calculate_correlation_coefficients(models, X, y):
+    """
+    Calcula os coeficientes de correlação para todos os modelos.
+    """
+    correlations = {}
+    for name, model in models.items():
+        model_clone = clone(model)
+        model_clone.fit(X, y)
+        y_pred = model_clone.predict(X)
+        correlation = np.corrcoef(y, y_pred)[0, 1]
+        correlations[name] = correlation
+    return correlations
 
-# Carrega variáveis de ambiente do arquivo .env
-load_dotenv()
-USE_TIMING = os.getenv("USE_TIMING", "True").lower() == "true"
-
-# Define o decorator timing
 def timing(func):
     """
     Decorator para medir o tempo de execução de uma função.
@@ -69,10 +76,13 @@ def sanitize_symbol(symbol: str) -> str:
     return symbol.replace('/', '_')
 
 def get_current_datetime() -> str:
+
+
     """
     Gera um prefixo com a data e hora atual no formato 'YYYYMMDD_HHMM'.
 
     Returns:
         str: Prefixo com data e hora atual.
     """
+
     return datetime.datetime.now().strftime('%Y%m%d_%H%M')

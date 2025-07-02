@@ -14,7 +14,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import PROCESSED_FILE, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
-from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime
+from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients
 
 '''
 Análise de Performance (com K-Fold): Manteremos sua validação K-Fold original para gerar a tabela de RMSE e provar a performance geral dos modelos.
@@ -97,30 +97,6 @@ def k_fold_validation(model, X, y, n_splits=5):
         mse_scores.append(mean_squared_error(y_test, y_pred))
 
     return np.mean(mse_scores)
-
-@timing
-def _walk_forward_prediction(model, X, y, min_train_size=30):
-    """
-    Gera previsões cronológicas usando a abordagem Walk-Forward (janela expansível).
-    Retorna uma série contínua de previsões feitas apenas com dados passados.
-    """
-
-    predictions = []
-
-    n_splits = len(X) - min_train_size
-    tscv = TimeSeriesSplit(n_splits=n_splits, test_size=1)
-    
-    def train_and_predict(indices):
-        train_index, test_index = indices
-        model_clone = clone(model)
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train = y.iloc[train_index]
-        model_clone.fit(X_train, y_train)
-        return model_clone.predict(X_test)[0]
-    
-    predictions = np.array([train_and_predict(indices) for indices in tscv.split(X)])
-
-    return predictions
 
 @timing
 def walk_forward_prediction(model, X, y, min_train_size=30):
@@ -280,7 +256,7 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     # Salva o gráfico na pasta figures antes de mostrar
     plt.savefig(f"figures/{file_name}", dpi=150, bbox_inches='tight')
     
-    plt.show()
+    #plt.show()
     plt.close()
 
     # Ajusta o tamanho de 'dates_test_sim' para coincidir com 'capital_evolution'
@@ -423,23 +399,8 @@ def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
     # Salva o gráfico na pasta figures antes de mostrar
     plt.savefig(f"figures/{scatter_file_name}", dpi=150, bbox_inches='tight')
     
-    plt.show()
+    #plt.show()
     plt.close()
-
-
-def calculate_correlation_coefficients(models, X, y):
-    """
-    Calcula os coeficientes de correlação para todos os modelos.
-    """
-    correlations = {}
-    for name, model in models.items():
-        model_clone = clone(model)
-        model_clone.fit(X, y)
-        y_pred = model_clone.predict(X)
-        correlation = np.corrcoef(y, y_pred)[0, 1]
-        correlations[name] = correlation
-    return correlations
-
 
 def determine_best_equation(models, X, y):
     """

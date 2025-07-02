@@ -49,3 +49,6 @@ SYMBOL_TO_SIMULATE = os.getenv("SYMBOL_TO_SIMULATE", "BTC/USDT")
 
 # Define o capital inicial para simulação com base no .env
 INITIAL_CAPITAL = float(os.getenv("INITIAL_CAPITAL", "1000.0"))
+
+# Define se o timing deve ser utilizado com base no .env
+USE_TIMING = os.getenv("USE_TIMING", "True").lower() == "true"
