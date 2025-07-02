@@ -47,8 +47,13 @@ def run_combine_csv_files(raw_folder, processed_file):
     # Combina os arquivos CSV
     combine_csv_files(raw_folder, processed_file)
 
-if __name__ == "__main__":
+def main():
+    """Função principal para ser chamada por outros métodos."""
+
     try:
         run_combine_csv_files(RAW_DATA, PROCESSED_FILE)
     except Exception:
         print("Ocorreu um erro inesperado. Verifique os logs acima.")
+
+if __name__ == "__main__":
+    main()        

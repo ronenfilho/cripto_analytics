@@ -4,8 +4,9 @@ import os
 import matplotlib.pyplot as plt
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import PROCESSED_FILE
+from src.config import PROCESSED_FILE, SYMBOLS
 from src.utils import timing, filter_symbols
+
 
 @timing
 def calculate_summary_statistics(data: pd.DataFrame) -> pd.DataFrame:
@@ -216,12 +217,65 @@ def plot_price_trends_by_month_year(data: pd.DataFrame):
         plt.savefig(f"figures/{sanitized_symbol}_price_trends_month_year.png", dpi=150)
         plt.close()
 
-if __name__ == "__main__":
+@timing
+def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calcula features baseadas em séries temporais para previsão de preços.
+    
+    Features incluídas:
+    - Média móvel (7 dias)
+    - Desvio padrão (7 dias)
+    - Retornos (1 e 7 dias)
+    - Máximo e mínimo (7 dias)
+    - Momentum (diferença entre preços)
+    - Volatilidade (desvio dos retornos)
+    
+    Args:
+        data (pd.DataFrame): DataFrame com colunas ['date', 'symbol', 'close'].
+    
+    Returns:
+        pd.DataFrame: DataFrame com novas colunas de features.
+    """
+    data = data.copy()
+
+    # Calcula o retorno diário
+    data['return_1d'] = data['close'].pct_change(1)
+
+    # Agrupa por símbolo (para suportar múltiplas moedas)
+    data['symbol_original'] = data['symbol']  # salva o valor antes do apply
+
+    data = data.groupby('symbol', group_keys=False).apply(
+        lambda df: df.assign(
+            mean_7d=df['close'].rolling(window=7).mean(),
+            std_7d=df['close'].rolling(window=7).std(),
+            return_7d=df['close'].pct_change(7),
+            rolling_max_7d=df['close'].rolling(window=7).max(),
+            rolling_min_7d=df['close'].rolling(window=7).min(),
+            momentum_7d=df['close'] - df['close'].shift(7),
+            volatility_7d=df['return_1d'].rolling(window=7).std()
+        ),
+        include_groups=False
+    )
+
+    # Renomeia a coluna de volta para 'symbol'
+    data = data.rename(columns={'symbol_original': 'symbol'})
+
+    # Verificação básica de colunas essenciais
+    expected_cols = ['mean_7d', 'std_7d']
+    for col in expected_cols:
+        if col not in data.columns:
+            raise ValueError(f"A coluna '{col}' não foi calculada corretamente.")
+
+    return data
+
+def main():
+    """Função principal para ser chamada por outros métodos.
+    Carrega os dados processados, filtra conforme os símbolos selecionados, calcula estatísticas resumo e gera visualizações.
+    """
+    
     data = pd.read_csv(PROCESSED_FILE)
 
-    symbols = []    
-    #symbols = ['BTC/USDT', 'ETH/USDT']
-    #symbols = ['BTC/USDT']
+    symbols = SYMBOLS    
 
     print(f"Símbolo: {symbols if symbols else 'Todos'}")
 
@@ -250,3 +304,6 @@ if __name__ == "__main__":
     # Gera e salva gráficos de tendências de preço por mês/ano
     plot_price_trends_by_month_year(filtered_data)
     print("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
+
+if __name__ == "__main__":
+    main()    

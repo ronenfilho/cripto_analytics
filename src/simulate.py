@@ -7,15 +7,15 @@ from sklearn.base import clone
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from sklearn.preprocessing import PolynomialFeatures
-from sklearn.pipeline import make_pipeline
-from sklearn.metrics import mean_squared_error
+
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import PROCESSED_FILE, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
 from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients, calculate_standard_error_between_mlp_and_best, determine_best_equation, calculate_standard_error
-from src.models import k_fold_validation, walk_forward_prediction
+from src.models import walk_forward_prediction, run_training_data
+from src.features import calculate_features
 
 '''
 Análise de Performance (com K-Fold): Manteremos sua validação K-Fold original para gerar a tabela de RMSE e provar a performance geral dos modelos.
@@ -27,57 +27,6 @@ Treina com dados do dia 1 ao 101, prevê o dia 102.
 E assim por diante...
 Isso garante que cada previsão seja feita usando apenas dados do passado, simulando perfeitamente um ambiente real.
 '''
-
-@timing
-def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calcula features baseadas em séries temporais para previsão de preços.
-    
-    Features incluídas:
-    - Média móvel (7 dias)
-    - Desvio padrão (7 dias)
-    - Retornos (1 e 7 dias)
-    - Máximo e mínimo (7 dias)
-    - Momentum (diferença entre preços)
-    - Volatilidade (desvio dos retornos)
-    
-    Args:
-        data (pd.DataFrame): DataFrame com colunas ['date', 'symbol', 'close'].
-    
-    Returns:
-        pd.DataFrame: DataFrame com novas colunas de features.
-    """
-    data = data.copy()
-
-    # Calcula o retorno diário
-    data['return_1d'] = data['close'].pct_change(1)
-
-    # Agrupa por símbolo (para suportar múltiplas moedas)
-    data['symbol_original'] = data['symbol']  # salva o valor antes do apply
-
-    data = data.groupby('symbol', group_keys=False).apply(
-        lambda df: df.assign(
-            mean_7d=df['close'].rolling(window=7).mean(),
-            std_7d=df['close'].rolling(window=7).std(),
-            return_7d=df['close'].pct_change(7),
-            rolling_max_7d=df['close'].rolling(window=7).max(),
-            rolling_min_7d=df['close'].rolling(window=7).min(),
-            momentum_7d=df['close'] - df['close'].shift(7),
-            volatility_7d=df['return_1d'].rolling(window=7).std()
-        ),
-        include_groups=False
-    )
-
-    # Renomeia a coluna de volta para 'symbol'
-    data = data.rename(columns={'symbol_original': 'symbol'})
-
-    # Verificação básica de colunas essenciais
-    expected_cols = ['mean_7d', 'std_7d']
-    for col in expected_cols:
-        if col not in data.columns:
-            raise ValueError(f"A coluna '{col}' não foi calculada corretamente.")
-
-    return data
 
 @timing
 def simulate_returns(y_test: pd.Series, y_pred: np.ndarray, initial_capital: float = 1000.0) -> list:
@@ -211,75 +160,6 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     print(" - Apenas se a previsão do valor de fechamento do próximo dia for superior ao do dia atual.")
     print("\n")
 
-@timing
-def run_training_data():
-    """
-    Executa o fluxo completo de treinamento e validação dos modelos.
-    """
-    
-    symbols = SYMBOLS
-
-    try:
-        data = pd.read_csv(PROCESSED_FILE)
-    except FileNotFoundError:
-        print(f"Erro: Arquivo não encontrado em '{PROCESSED_FILE}'. Ajuste a variável no script.")
-        sys.exit(1)
-
-    # --- PARTE 1: Análise de Performance com K-Fold ---
-    print('\n')
-    print('#################################################################')
-    print("PARTE 1: Análise de Performance com K-Fold (Legenda):")
-    print('#################################################################')    
-    print(f" - Erro médio quadrático (MSE)")
-    print(f" - Raiz do erro médio quadrático (RMSE)")    
-    print('\n')     
-
-    print(f"Símbolo: {symbols if symbols else 'Todos'}")
-
-    # Filtra os dados conforme os símbolos selecionados
-    filtered_data = filter_symbols(data, symbols if symbols else None)
-
-    # Calcula features
-    data_calculate = calculate_features(filtered_data)
-
-    # Remove linhas com valores ausentes
-    features_to_check = ['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']
-    data_calculate = data_calculate.dropna(subset=features_to_check)
-    print(f"Dados após remoção de NaNs:\n{data_calculate[features_to_check].head()}")
-
-    # Define X e y
-    X = data_calculate[['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']]
-    y = data_calculate['close']
-
-    # Filtra os modelos ativos
-    active_models = {name: model for name, model in MODELS.items() if model}
-
-    # Cria instâncias dos modelos ativos
-    models = {}
-    for name in active_models.keys():
-        if name == "LinearRegression":
-            models[name] = LinearRegression()
-        elif name == "MLPRegressor":
-            models[name] = MLPRegressor(hidden_layer_sizes=(50,), max_iter=400, random_state=42)
-        elif name == "PolynomialRegression":
-            poly_degree_range = range(int(POLYNOMIAL_DEGREE_RANGE[0]), int(POLYNOMIAL_DEGREE_RANGE[1]) + 1)
-            for degree in poly_degree_range:
-                models[f"PolynomialRegression_degree_{degree}"] = make_pipeline(PolynomialFeatures(degree), LinearRegression())
-
-    results = []
-
-    for name, model in models.items():
-        mse = k_fold_validation(model, X, y)
-        rmse = np.sqrt(mse)
-        results.append({"Modelo": name, "MSE": mse, "RMSE": rmse})    
-
-    results_df = pd.DataFrame(results)
-    print("Comparação de Modelos:")
-    print(results_df)
-
-    return models, data_calculate
-
-# Adiciona métodos para análise dos modelos
 
 def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
     """
@@ -309,7 +189,9 @@ def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
     #plt.show()
     plt.close()
 
-if __name__ == "__main__":
+def main():
+    """Função principal para executar o fluxo de simulação de investimento e análise de modelos."""     
+
     # --- PARTE 1: Treinamento e Validação dos Modelos ---
     models, data = run_training_data()
 
@@ -350,3 +232,6 @@ if __name__ == "__main__":
     # Calcula o erro padrão entre MLP e o melhor regressor
     error_between_mlp_and_best = calculate_standard_error_between_mlp_and_best(models, X, y)
     print(f"Erro Padrão entre MLP e {best_model_name}: {error_between_mlp_and_best:.4f}")
+
+if __name__ == "__main__":
+    main()

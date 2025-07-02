@@ -9,12 +9,15 @@ from sklearn.base import clone
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 from sklearn.model_selection import TimeSeriesSplit
-
+from sklearn.linear_model import LinearRegression
+from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import USE_TIMING, INITIAL_CAPITAL
-from src.utils import timing
-from src.utils import filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients
+from src.config import INITIAL_CAPITAL, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, PROCESSED_FILE
+from src.features import calculate_features
+from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients
 
 @timing
 def walk_forward_prediction(model, X, y, min_train_size=30):
@@ -110,3 +113,83 @@ def k_fold_validation(model, X, y, n_splits=5):
         mse_scores.append(mean_squared_error(y_test, y_pred))
 
     return np.mean(mse_scores)
+
+
+@timing
+def run_training_data():
+    """
+    Executa o fluxo completo de treinamento e validação dos modelos.
+    """
+    
+    symbols = SYMBOLS
+
+    try:
+        data = pd.read_csv(PROCESSED_FILE)
+    except FileNotFoundError:
+        print(f"Erro: Arquivo não encontrado em '{PROCESSED_FILE}'. Ajuste a variável no script.")
+        sys.exit(1)
+
+    # --- PARTE 1: Análise de Performance com K-Fold ---
+    print('\n')
+    print('#################################################################')
+    print("PARTE 1: Análise de Performance com K-Fold (Legenda):")
+    print('#################################################################')    
+    print(f" - Erro médio quadrático (MSE)")
+    print(f" - Raiz do erro médio quadrático (RMSE)")    
+    print('\n')     
+
+    print(f"Símbolo: {symbols if symbols else 'Todos'}")
+
+    # Filtra os dados conforme os símbolos selecionados
+    filtered_data = filter_symbols(data, symbols if symbols else None)
+
+    # Calcula features
+    data_calculate = calculate_features(filtered_data)
+
+    # Remove linhas com valores ausentes
+    features_to_check = ['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']
+    data_calculate = data_calculate.dropna(subset=features_to_check)
+    print(f"Dados após remoção de NaNs:\n{data_calculate[features_to_check].head()}")
+
+    # Define X e y
+    X = data_calculate[['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']]
+    y = data_calculate['close']
+
+    # Filtra os modelos ativos
+    active_models = {name: model for name, model in MODELS.items() if model}
+
+    # Cria instâncias dos modelos ativos
+    models = {}
+    for name in active_models.keys():
+        if name == "LinearRegression":
+            models[name] = LinearRegression()
+        elif name == "MLPRegressor":
+            models[name] = MLPRegressor(hidden_layer_sizes=(50,), max_iter=400, random_state=42)
+        elif name == "PolynomialRegression":
+            poly_degree_range = range(int(POLYNOMIAL_DEGREE_RANGE[0]), int(POLYNOMIAL_DEGREE_RANGE[1]) + 1)
+            for degree in poly_degree_range:
+                models[f"PolynomialRegression_degree_{degree}"] = make_pipeline(PolynomialFeatures(degree), LinearRegression())
+
+    results = []
+
+    for name, model in models.items():
+        mse = k_fold_validation(model, X, y)
+        rmse = np.sqrt(mse)
+        results.append({"Modelo": name, "MSE": mse, "RMSE": rmse})    
+
+    results_df = pd.DataFrame(results)
+    print("Comparação de Modelos:")
+    print(results_df)
+
+    return models, data_calculate
+
+def main():
+    """
+    Função principal para ser chamada por outros métodos.
+    """
+    models, data_calculate = run_training_data()
+    return models, data_calculate
+
+
+if __name__ == "__main__":
+    main()
