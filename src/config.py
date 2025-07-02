@@ -3,10 +3,6 @@ import os
 from dotenv import load_dotenv # type: ignore
 from pathlib import Path
 
-
-# Carrega o .env apenas uma vez ao importar
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
-
 # Diretório raiz
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,7 +17,7 @@ PROCESSED_FILE = PROCESSED_DATA / 'cripto_data.csv'
 load_dotenv()
 
 # Define a quantidade de dias da simulação com base no .env
-TEST_PERIOD_DAYS = int(os.getenv("TEST_PERIOD_DAYS", "30"))
+TEST_PERIOD_DAYS = int(os.getenv("TEST_PERIOD_DAYS", "20"))
 SYMBOLS = os.getenv("SYMBOLS", "BTC/USDT").split(',')
 
 # Atualiza os modelos ativos com base no .env
@@ -52,3 +48,5 @@ INITIAL_CAPITAL = float(os.getenv("INITIAL_CAPITAL", "1000.0"))
 
 # Define se o timing deve ser utilizado com base no .env
 USE_TIMING = os.getenv("USE_TIMING", "True").lower() == "true"
+
+

@@ -1,24 +1,33 @@
 import os
-import sys  
+import sys
+import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import src.data_load as data_load
-import src.features as features
-import src.models as models
-import src.simulate as simulate
+from src.data_load import main as data_load_main
+from src.features import main as features_main
+from src.models import main as models_main
+from src.simulate import main as simulate_main
+from src.utils import setup_logging
+
+setup_logging()
 
 if __name__ == "__main__":
-    print("Executando o pipeline de análise de criptomoedas...")
+    try:
+        #logging.info("Executando o pipeline de análise de criptomoedas...")
 
-    # Carregar dados
-    data_load.main()
+        # Carregar dados
+        data = data_load_main()
 
-    # Calcular features
-    features.main()
+        # Calcular features
+        data_with_features = features_main()
 
-    # Treinar modelos
-    #models, data_calculate = models.main()
+        # Treinar modelos
+        models, data_calculate = models_main()
 
-    # Simular investimentos
-    simulate.main()
+        # Simular investimentos
+        simulate_main(data_calculate, models=models)
+
+        #logging.info("Pipeline concluído com sucesso.")
+    except Exception as e:
+        logging.critical(f"Erro crítico durante a execução: {e}")
 

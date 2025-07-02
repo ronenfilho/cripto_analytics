@@ -1,18 +1,14 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import KFold, TimeSeriesSplit
-from sklearn.linear_model import LinearRegression
-from sklearn.neural_network import MLPRegressor
 from sklearn.base import clone
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-from sklearn.preprocessing import PolynomialFeatures
 
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import PROCESSED_FILE, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
+from src.config import SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
 from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients, calculate_standard_error_between_mlp_and_best, determine_best_equation, calculate_standard_error
 from src.models import walk_forward_prediction, run_training_data
 from src.features import calculate_features
@@ -43,7 +39,7 @@ def simulate_returns(y_test: pd.Series, y_pred: np.ndarray, initial_capital: flo
     return capital_evolution.tolist()
 
 @timing
-def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, models: dict, initial_capital: float = 1000.0, test_period_days: int = 365):
+def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, models: dict, initial_capital: float = 1000.0, test_period_days: int = 10):
     """
     Executa o fluxo completo de simulação de investimento para um ativo e plota o resultado.
     Simula os últimos 'test_period_days' dias.
@@ -189,11 +185,14 @@ def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
     #plt.show()
     plt.close()
 
-def main():
+def main(data=None, models=None):
     """Função principal para executar o fluxo de simulação de investimento e análise de modelos."""     
 
     # --- PARTE 1: Treinamento e Validação dos Modelos ---
-    models, data = run_training_data()
+    if models is not None and data is not None:
+        print("Usando modelos e dados fornecidos pelo usuário.")
+    else:
+        models, data = run_training_data()
 
     # Define X e y para análise
     X = data[['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']]

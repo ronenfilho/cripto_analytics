@@ -7,10 +7,21 @@ import sys
 import numpy as np
 from sklearn.base import clone
 from sklearn.metrics import mean_squared_error
+import logging
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import USE_TIMING
+
+def setup_logging():
+    logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler()
+    ]
+)
 
 def determine_best_equation(models, X, y):
     """
@@ -130,8 +141,6 @@ def sanitize_symbol(symbol: str) -> str:
     return symbol.replace('/', '_')
 
 def get_current_datetime() -> str:
-
-
     """
     Gera um prefixo com a data e hora atual no formato 'YYYYMMDD_HHMM'.
 
@@ -140,3 +149,4 @@ def get_current_datetime() -> str:
     """
 
     return datetime.datetime.now().strftime('%Y%m%d_%H%M')
+
