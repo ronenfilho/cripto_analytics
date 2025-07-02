@@ -10,20 +10,11 @@ import matplotlib.ticker as mticker
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 import os
-from dotenv import load_dotenv
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import PROCESSED_FILE
+from src.config import PROCESSED_FILE, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, USE_POLYNOMIAL_REGRESSION, SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
 from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime
-
-# Carrega variáveis de ambiente do arquivo .env
-load_dotenv()
-
-# Define a quantidade de dias da simulação com base no .env
-TEST_PERIOD_DAYS = int(os.getenv("TEST_PERIOD_DAYS", "30"))
-
-SYMBOLS = os.getenv("SYMBOLS", "").split(',')
 
 '''
 Análise de Performance (com K-Fold): Manteremos sua validação K-Fold original para gerar a tabela de RMSE e provar a performance geral dos modelos.
@@ -302,12 +293,6 @@ def run_training_data():
     X = data_calculate[['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']]
     y = data_calculate['close']
 
-    # Atualiza os modelos ativos com base no .env
-    MODELS = {
-        "LinearRegression": os.getenv("USE_LINEAR_REGRESSION", "True").lower() == "true",
-        "MLPRegressor": os.getenv("USE_MLP_REGRESSOR", "True").lower() == "true",
-    }
-
     # Filtra os modelos ativos
     active_models = {name: model for name, model in MODELS.items() if model}
 
@@ -319,11 +304,9 @@ def run_training_data():
         elif name == "MLPRegressor":
             models[name] = MLPRegressor(hidden_layer_sizes=(50,), max_iter=400, random_state=42)  # Reduzido de (100, 50) e 500 iterações            
 
-    # Atualiza para suportar intervalo de graus para PolynomialRegression
-    poly_degree_range = os.getenv("POLYNOMIAL_DEGREE_RANGE", "2,5").split(',')
-    poly_degree_range = range(int(poly_degree_range[0]), int(poly_degree_range[1]) + 1)
+    poly_degree_range = range(int(POLYNOMIAL_DEGREE_RANGE[0]), int(POLYNOMIAL_DEGREE_RANGE[1]) + 1)
 
-    if os.getenv("USE_POLYNOMIAL_REGRESSION", "True").lower() == "true":
+    if USE_POLYNOMIAL_REGRESSION:
         from sklearn.pipeline import make_pipeline
         from sklearn.preprocessing import PolynomialFeatures
         for degree in poly_degree_range:
@@ -439,7 +422,6 @@ def calculate_standard_error_between_mlp_and_best(models, X, y):
     error = np.sqrt(mean_squared_error(y_pred_mlp, y_pred_best))
     return error
 
-# Ajusta o escopo para garantir que models, X e y sejam definidos antes da chamada dos métodos
 if __name__ == "__main__":
     # --- PARTE 1: Treinamento e Validação dos Modelos ---
     models, data = run_training_data()
@@ -450,8 +432,8 @@ if __name__ == "__main__":
 
     # --- PARTE 2: Chamada para a Simulação de Investimento ---
     # Atualiza para usar valores do .env para symbol_to_simulate e initial_capital
-    symbol_to_simulate = os.getenv("SYMBOL_TO_SIMULATE", "BTC/USDT")
-    initial_capital = float(os.getenv("INITIAL_CAPITAL", "1000.0"))
+    symbol_to_simulate = SYMBOL_TO_SIMULATE
+    initial_capital = INITIAL_CAPITAL
 
     run_investment_simulation(data=data, symbol_to_simulate=symbol_to_simulate, models=models, initial_capital=initial_capital, test_period_days=TEST_PERIOD_DAYS)
 
