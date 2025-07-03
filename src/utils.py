@@ -9,19 +9,21 @@ from sklearn.base import clone
 from sklearn.metrics import mean_squared_error
 import logging
 
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import USE_TIMING
+from src.config import USE_TIMING, LOG_LEVEL
 
 def setup_logging():
+    # Define o nível de logging a partir do .env
+    log_level = getattr(logging, LOG_LEVEL.upper(), logging.INFO)
+
     logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("app.log"),
-        logging.StreamHandler()
-    ]
-)
+        level=log_level,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler("app.log"),
+            logging.StreamHandler()
+        ]
+    )
 
 def determine_best_equation(models, X, y):
     """
