@@ -13,11 +13,17 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
+import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import INITIAL_CAPITAL, SYMBOLS, MODELS, POLYNOMIAL_DEGREE_RANGE, PROCESSED_FILE
 from src.features import calculate_features
-from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients
+from src.utils import timing, filter_symbols, setup_logging
+
+setup_logging()
+
+# Configura o logger
+logger = logging.getLogger(__name__)
 
 @timing
 def walk_forward_prediction(model, X, y, min_train_size=30):
@@ -32,7 +38,7 @@ def walk_forward_prediction(model, X, y, min_train_size=30):
     n_splits = len(X) - min_train_size
     tscv = TimeSeriesSplit(n_splits=n_splits, test_size=1)
     
-    print(f"Iniciando predição Walk-Forward para {model.__class__.__name__}...")
+    logger.info(f"Iniciando predição Walk-Forward para {model.__class__.__name__}...")
 
     # Inicializa o saldo acumulado fora do loop
     accumulated_balance = INITIAL_CAPITAL
@@ -65,8 +71,8 @@ def walk_forward_prediction(model, X, y, min_train_size=30):
             accumulated_balance *= (current_price / previous_price) if action == "Compra realizada" else 1
         
         # Imprime o status do progresso a cada 1 dia ou no último dia
-        #if (i + 1) % 1 == 0 or (i + 1) == n_splits:
-        # (Removido: cálculo de porcentagem de acerto/erro dentro do loop)
+        if (i + 1) % 1 == 0 or (i + 1) == n_splits:
+            logger.info(f"Dia {i + 1}/{n_splits}: Previsão = {pred:.2f}, Preço atual = {current_price:.2f}, Ação = {action}, Saldo acumulado = {accumulated_balance:.2f}")
 
     # Calcula a porcentagem de erro e acerto após o loop
     correct_predictions = 0
@@ -86,9 +92,9 @@ def walk_forward_prediction(model, X, y, min_train_size=30):
     y_future = y.iloc[min_train_size:min_train_size + total_days].values
     total_buys = np.sum(np.array(predictions) > y_future)
 
-    print(f"\nPorcentagem de acerto: {accuracy_percentage:.2f}%")
-    print(f"Porcentagem de erro: {error_percentage:.2f}%")
-    print(f"Total de compras sugeridas: {total_buys}/{total_days} dias")
+    logger.info(f"\nPorcentagem de acerto: {accuracy_percentage:.2f}%")
+    logger.info(f"Porcentagem de erro: {error_percentage:.2f}%")
+    logger.info(f"Total de compras sugeridas: {total_buys}/{total_days} dias")
 
     # Retorna o array de previsões
     return np.array(predictions)
@@ -126,19 +132,19 @@ def run_training_data():
     try:
         data = pd.read_csv(PROCESSED_FILE)
     except FileNotFoundError:
-        print(f"Erro: Arquivo não encontrado em '{PROCESSED_FILE}'. Ajuste a variável no script.")
+        logger.error(f"Erro: Arquivo não encontrado em '{PROCESSED_FILE}'. Ajuste a variável no script.")
         sys.exit(1)
 
     # --- PARTE 1: Análise de Performance com K-Fold ---
-    print('\n')
-    print('#################################################################')
-    print("PARTE 1: Análise de Performance com K-Fold (Legenda):")
-    print('#################################################################')    
-    print(f" - Erro médio quadrático (MSE)")
-    print(f" - Raiz do erro médio quadrático (RMSE)")    
-    print('\n')     
+    
+    logger.info('#################################################################')
+    logger.info("PARTE 1: Análise de Performance com K-Fold (Legenda):")
+    logger.info('#################################################################')    
+    logger.info(f" - Erro médio quadrático (MSE)")
+    logger.info(f" - Raiz do erro médio quadrático (RMSE)")    
+    
 
-    print(f"Símbolo: {symbols if symbols else 'Todos'}")
+    logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
 
     # Filtra os dados conforme os símbolos selecionados
     filtered_data = filter_symbols(data, symbols if symbols else None)
@@ -149,7 +155,7 @@ def run_training_data():
     # Remove linhas com valores ausentes
     features_to_check = ['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']
     data_calculate = data_calculate.dropna(subset=features_to_check)
-    print(f"Dados após remoção de NaNs:\n{data_calculate[features_to_check].head()}")
+    logger.debug(f"Dados após remoção de NaNs:\n{data_calculate[features_to_check].head()}")
 
     # Define X e y
     X = data_calculate[['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']]
@@ -178,8 +184,8 @@ def run_training_data():
         results.append({"Modelo": name, "MSE": mse, "RMSE": rmse})    
 
     results_df = pd.DataFrame(results)
-    print("Comparação de Modelos:")
-    print(results_df)
+    logger.info("Comparação de Modelos:")
+    logger.info(results_df)
 
     return models, data_calculate
 
