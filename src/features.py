@@ -43,7 +43,7 @@ def calculate_summary_statistics(data: pd.DataFrame) -> pd.DataFrame:
     return grouped_stats
 
 @timing
-def generate_visualizations(data: pd.DataFrame):
+def generate_visualizations(data: pd.DataFrame) -> None:
     """
     Gera boxplots e histogramas dos preços de fechamento agrupados por 'symbol'.
 
@@ -119,7 +119,7 @@ def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
     return variability
 
 @timing
-def plot_variability(data: pd.DataFrame):
+def plot_variability(data: pd.DataFrame) -> None:
     """
     Cria e salva um gráfico de barras com a análise da variabilidade entre as criptomoedas.
 
@@ -162,7 +162,7 @@ def plot_variability(data: pd.DataFrame):
     logger.info("Função plot_variability concluída com sucesso.")
 
 @timing
-def plot_normalized_variability(data: pd.DataFrame):
+def plot_normalized_variability(data: pd.DataFrame) -> None:
     """
     Cria e salva um gráfico de barras com a variabilidade normalizada e anotações.
 
@@ -193,7 +193,7 @@ def plot_normalized_variability(data: pd.DataFrame):
     logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'.")
 
 @timing
-def plot_price_trends_by_month_year(data: pd.DataFrame):
+def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
     """
     Cria e salva gráficos de linha por símbolo agrupados por mês e ano com o preço de fechamento destacando média, mediana e moda.
 
@@ -278,7 +278,7 @@ def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
     logger.debug("Features calculadas com sucesso.")
     return data
 
-def main():
+def main() -> None:
     """Função principal para ser chamada por outros métodos.
     Carrega os dados processados, filtra conforme os símbolos selecionados, calcula estatísticas resumo e gera visualizações.
     """
