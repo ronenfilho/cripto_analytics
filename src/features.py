@@ -2,11 +2,23 @@ import pandas as pd
 import sys
 import os
 import matplotlib.pyplot as plt
+import warnings
+import logging
+
+# Ignora todos os warnings
+warnings.filterwarnings("ignore")
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import PROCESSED_FILE, SYMBOLS
-from src.utils import timing, filter_symbols
+from src.utils import timing, filter_symbols, setup_logging
 
+setup_logging()
+
+# Configura o logger
+logger = logging.getLogger(__name__)
+
+# Ignora logs do Matplotlib
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
 
 @timing
 def calculate_summary_statistics(data: pd.DataFrame) -> pd.DataFrame:
@@ -16,19 +28,18 @@ def calculate_summary_statistics(data: pd.DataFrame) -> pd.DataFrame:
 
     Args:
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
-        symbol (str, opcional): Símbolo da criptomoeda. Se None, calcula para todos.
 
     Returns:
         pd.DataFrame: DataFrame com as medidas resumo e de dispersão agrupadas por 'symbol' ou para o símbolo informado.
     """
-
-    print('\n')
-    print('#################################################################')
-    print(f"Obter medidas resumo e medidas de dispersão.")  
-    print('#################################################################')  
-    print('\n')
+    logger.info("Iniciando a função calculate_summary_statistics.")
+    logger.debug(f"Tamanho do DataFrame recebido: {data.shape}")
+    logger.debug(f"Colunas do DataFrame: {data.columns.tolist()}")
 
     grouped_stats = data.groupby('symbol')['close'].describe()
+    logger.debug(f"Medidas resumo calculadas: {grouped_stats}")
+
+    logger.info("Função calculate_summary_statistics concluída com sucesso.")
     return grouped_stats
 
 @timing
@@ -39,20 +50,20 @@ def generate_visualizations(data: pd.DataFrame):
     Args:
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
     """
-
-    print('\n')
-    print('#################################################################')
-    print(f"Construir boxplot e/ou histograma do preço de fechamento.")
-    print('#################################################################')
-    print('\n')
+    logger.info("Iniciando a função generate_visualizations.")
+    logger.debug(f"Tamanho do DataFrame recebido: {data.shape}")
+    logger.debug(f"Colunas do DataFrame: {data.columns.tolist()}")
 
     symbols = data['symbol'].unique()
+    logger.info(f"Símbolos encontrados: {symbols}")
 
-    # Garante que a pasta 'figures' existe
     os.makedirs('figures', exist_ok=True)
 
     for symbol in symbols:
+        logger.info(f"Processando o símbolo: {symbol}")
         symbol_data = data[data['symbol'] == symbol]
+
+        logger.debug(f"Tamanho dos dados para {symbol}: {symbol_data.shape}")
 
         # Boxplot
         plt.figure(figsize=(10, 6))
@@ -60,13 +71,11 @@ def generate_visualizations(data: pd.DataFrame):
         plt.title(f"Boxplot - {symbol}")
         plt.xlabel("Symbol")
         plt.ylabel("Preço de Fechamento")
-        
-        # Substitui '/' por '_' no nome do símbolo
-        sanitized_symbol = symbol.replace('/', '_')
 
-        # Salva os gráficos com o nome sanitizado
+        sanitized_symbol = symbol.replace('/', '_')
         plt.savefig(f"figures/{sanitized_symbol}_boxplot.png", dpi=150)
         plt.close()
+        logger.info(f"Boxplot salvo para o símbolo: {symbol}")
 
         # Histograma
         plt.figure(figsize=(10, 6))
@@ -76,6 +85,9 @@ def generate_visualizations(data: pd.DataFrame):
         plt.ylabel("Frequência")
         plt.savefig(f"figures/{sanitized_symbol}_histogram.png", dpi=150)
         plt.close()
+        logger.info(f"Histograma salvo para o símbolo: {symbol}")
+
+        logger.debug(f"Histograma salvo para o símbolo: {symbol}")
 
 @timing
 def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
@@ -89,14 +101,21 @@ def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: DataFrame com a variabilidade (desvio padrão) de cada moeda.
     """
 
-    print('\n')
-    print('#################################################################')
-    print(f"Analisar a variabilidade entre as criptomoedas com base nas medidas de dispersão.")
-    print('#################################################################')
-    print('\n')
+    
+    logger.info('#################################################################')
+    logger.info(f"Analisar a variabilidade entre as criptomoedas com base nas medidas de dispersão.")
+    logger.info('#################################################################')
+    
+
+    logger.info("Iniciando a função compare_variability.")
+    logger.debug(f"Tamanho do DataFrame recebido: {data.shape}")
+    logger.debug(f"Colunas do DataFrame: {data.columns.tolist()}")
 
     variability = data.groupby('symbol')['close'].std().reset_index()
     variability.columns = ['symbol', 'variability']
+    logger.debug(f"Variabilidade calculada: {variability}")
+
+    logger.info("Função compare_variability concluída com sucesso.")
     return variability
 
 @timing
@@ -107,9 +126,12 @@ def plot_variability(data: pd.DataFrame):
     Args:
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
     """
+    logger.info("Iniciando a função plot_variability.")
+    logger.debug(f"Tamanho do DataFrame recebido: {data.shape}")
+    logger.debug(f"Colunas do DataFrame: {data.columns.tolist()}")
+
     variability = compare_variability(data)
 
-    # Garante que a pasta 'figures' existe
     os.makedirs('figures', exist_ok=True)
 
     # Gráfico de barras com escala logarítmica
@@ -123,6 +145,22 @@ def plot_variability(data: pd.DataFrame):
     plt.tight_layout()
     plt.savefig("figures/variability_analysis_log.png", dpi=150)
     plt.close()
+    logger.info("Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'")
+
+    # Gráfico de barras com variabilidade normalizada
+    normalized_variability = variability.copy()
+    normalized_variability['variability'] /= normalized_variability['variability'].max()
+
+    plt.figure(figsize=(12, 8))
+    plt.bar(normalized_variability['symbol'], normalized_variability['variability'])
+    plt.title("Análise de Variabilidade Normalizada")
+    plt.xlabel("Símbolo")
+    plt.ylabel("Variabilidade Normalizada")
+    plt.savefig("figures/variability_analysis_normalized.png", dpi=150)
+    plt.close()
+    logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
+
+    logger.info("Função plot_variability concluída com sucesso.")
 
 @timing
 def plot_normalized_variability(data: pd.DataFrame):
@@ -166,11 +204,11 @@ def plot_price_trends_by_month_year(data: pd.DataFrame):
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
     """
 
-    print('\n')
-    print('#################################################################')
-    print(f"Construir gráfico de linha com o preço de fechamento destacando a média, mediana e moda ao longo do tempo.")
-    print('#################################################################')
-    print('\n')
+    
+    logger.info('#################################################################')
+    logger.info(f"Construir gráfico de linha com o preço de fechamento destacando a média, mediana e moda ao longo do tempo.")
+    logger.info('#################################################################')
+    
 
     # Garante que a pasta 'figures' existe
     os.makedirs('figures', exist_ok=True)
@@ -277,33 +315,33 @@ def main():
 
     symbols = SYMBOLS    
 
-    print(f"Símbolo: {symbols if symbols else 'Todos'}")
+    logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
 
     # Use filter_symbols para filtrar os dados conforme os símbolos selecionados
     filtered_data = filter_symbols(data, symbols if symbols else None)
 
     # Calcula estatísticas resumo e de dispersão para as criptomoedas filtradas
     grouped_stats = calculate_summary_statistics(filtered_data)
-    print(grouped_stats)
+    logger.debug(grouped_stats)
 
     # Gera boxplots e histogramas dos preços de fechamento para os símbolos filtrados
     generate_visualizations(filtered_data)
 
     # Análise comparativa da variabilidade entre as moedas
     variability = compare_variability(filtered_data)
-    print(variability)
+    logger.debug(variability)
 
     # Gera e salva o gráfico de variabilidade
     plot_variability(filtered_data)
-    print("Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'")
+    logger.info("Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'")
 
     # Gera e salva o gráfico de variabilidade normalizada
     plot_normalized_variability(filtered_data)
-    print("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
+    logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
 
     # Gera e salva gráficos de tendências de preço por mês/ano
     plot_price_trends_by_month_year(filtered_data)
-    print("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
+    logger.info("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
 
 if __name__ == "__main__":
-    main()    
+    main()
