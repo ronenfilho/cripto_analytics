@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import logging
+import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.utils import timing, setup_logging
@@ -61,10 +62,10 @@ def run_combine_csv_files(raw_folder, processed_file):
     logger.debug(f"Pasta garantida: {os.path.dirname(processed_file)}")
     # Combina os arquivos CSV
     combine_csv_files(raw_folder, processed_file)
+    logging.info("Processo de combinação concluído.")
 
 def main():
     """Função principal para ser chamada por outros métodos."""
-
     try:
         logger.info("Iniciando o processo principal de combinação de CSVs.")
         run_combine_csv_files(RAW_DATA, PROCESSED_FILE)
@@ -73,4 +74,5 @@ def main():
         print("Ocorreu um erro inesperado. Verifique os logs acima.")
 
 if __name__ == "__main__":
+    main()
     main()

@@ -30,7 +30,7 @@ def calculate_summary_statistics(data: pd.DataFrame) -> pd.DataFrame:
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
 
     Returns:
-        pd.DataFrame: DataFrame com as medidas resumo e de dispersão agrupadas por 'symbol' ou para o símbolo informado.
+        pd.DataFrame: DataFrame com as medidas resumo e de dispersão agrupadas por 'symbol'.
     """
     logger.info("Iniciando a função calculate_summary_statistics.")
     logger.debug(f"Tamanho do DataFrame recebido: {data.shape}")
@@ -134,7 +134,6 @@ def plot_variability(data: pd.DataFrame):
 
     os.makedirs('figures', exist_ok=True)
 
-    # Gráfico de barras com escala logarítmica
     plt.figure(figsize=(12, 8))
     plt.bar(variability['symbol'], variability['variability'], color='skyblue')
     plt.yscale('log')
@@ -170,16 +169,14 @@ def plot_normalized_variability(data: pd.DataFrame):
     Args:
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
     """
-    variability = compare_variability(data)
+    logger.info("Criando gráfico de variabilidade normalizada entre as criptomoedas.")
 
-    # Normaliza os valores de variabilidade
+    variability = compare_variability(data)
     max_variability = variability['variability'].max()
     variability['normalized_variability'] = variability['variability'] / max_variability * 100
 
-    # Garante que a pasta 'figures' existe
     os.makedirs('figures', exist_ok=True)
 
-    # Gráfico de barras com variabilidade normalizada
     plt.figure(figsize=(12, 8))
     bars = plt.bar(variability['symbol'], variability['normalized_variability'], color='skyblue')
     plt.title("Variabilidade Normalizada entre as Criptomoedas")
@@ -187,13 +184,13 @@ def plot_normalized_variability(data: pd.DataFrame):
     plt.ylabel("Variabilidade Normalizada (%)")
     plt.xticks(rotation=45)
 
-    # Adiciona anotações nas barras
     for bar, value in zip(bars, variability['normalized_variability']):
         plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value:.1f}%", ha='center', va='bottom')
 
     plt.tight_layout()
     plt.savefig("figures/variability_analysis_normalized.png", dpi=150)
     plt.close()
+    logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'.")
 
 @timing
 def plot_price_trends_by_month_year(data: pd.DataFrame):
@@ -212,26 +209,17 @@ def plot_price_trends_by_month_year(data: pd.DataFrame):
 
     # Garante que a pasta 'figures' existe
     os.makedirs('figures', exist_ok=True)
-
-    # Converte a coluna 'date' para datetime
     data['date'] = pd.to_datetime(data['date'])
-
-    # Agrupa por mês e ano
     data['month_year'] = data['date'].dt.to_period('M')
 
     symbols = data['symbol'].unique()
 
     for symbol in symbols:
         symbol_data = data[data['symbol'] == symbol]
-
-        # Calcula média, mediana, moda e preço de fechamento por mês/ano
         grouped_data = symbol_data.groupby('month_year')['close'].agg(['mean', 'median', lambda x: x.mode()[0] if not x.mode().empty else None, 'last']).reset_index()
         grouped_data.columns = ['month_year', 'mean', 'median', 'mode', 'close']
-
-        # Substitui '/' por '_' no nome do símbolo
         sanitized_symbol = symbol.replace('/', '_')
 
-        # Gráfico de linha incluindo preço de fechamento
         plt.figure(figsize=(16, 10))
         plt.plot(grouped_data['month_year'].astype(str), grouped_data['mean'], label='Média', color='green', linestyle='--')
         plt.plot(grouped_data['month_year'].astype(str), grouped_data['median'], label='Mediana', color='orange', linestyle='--')
@@ -242,45 +230,29 @@ def plot_price_trends_by_month_year(data: pd.DataFrame):
         plt.xlabel("Mês/Ano")
         plt.ylabel("Preço de Fechamento")
         plt.legend()
-        plt.xticks(rotation=45, ha='right')  # Ajusta os rótulos para evitar sobreposição
-
-        # Ajusta os rótulos do eixo X para exibir apenas alguns labels de mês/ano, espaçando-os.
-        xticks = grouped_data['month_year'].astype(str)
-        plt.xticks(ticks=range(0, len(xticks), max(1, len(xticks) // 10)), labels=xticks[::max(1, len(xticks) // 10)], rotation=45, ha='right')
-
-        # Adiciona linhas horizontais aos gráficos
+        plt.xticks(rotation=45, ha='right')
         plt.grid(axis='y', linestyle='--', alpha=0.7)
-
         plt.tight_layout()
         plt.savefig(f"figures/{sanitized_symbol}_price_trends_month_year.png", dpi=150)
         plt.close()
+        logger.debug(f"Gráfico de tendências de preço salvo para o símbolo {symbol}.")
 
 @timing
 def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
     """
     Calcula features baseadas em séries temporais para previsão de preços.
-    
-    Features incluídas:
-    - Média móvel (7 dias)
-    - Desvio padrão (7 dias)
-    - Retornos (1 e 7 dias)
-    - Máximo e mínimo (7 dias)
-    - Momentum (diferença entre preços)
-    - Volatilidade (desvio dos retornos)
-    
+
     Args:
         data (pd.DataFrame): DataFrame com colunas ['date', 'symbol', 'close'].
-    
+
     Returns:
         pd.DataFrame: DataFrame com novas colunas de features.
     """
+    logger.info("Calculando features baseadas em séries temporais para previsão de preços.")
+
     data = data.copy()
-
-    # Calcula o retorno diário
     data['return_1d'] = data['close'].pct_change(1)
-
-    # Agrupa por símbolo (para suportar múltiplas moedas)
-    data['symbol_original'] = data['symbol']  # salva o valor antes do apply
+    data['symbol_original'] = data['symbol']
 
     data = data.groupby('symbol', group_keys=False).apply(
         lambda df: df.assign(
@@ -295,15 +267,15 @@ def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
         include_groups=False
     )
 
-    # Renomeia a coluna de volta para 'symbol'
     data = data.rename(columns={'symbol_original': 'symbol'})
 
-    # Verificação básica de colunas essenciais
     expected_cols = ['mean_7d', 'std_7d']
     for col in expected_cols:
         if col not in data.columns:
+            logger.error(f"A coluna '{col}' não foi calculada corretamente.")
             raise ValueError(f"A coluna '{col}' não foi calculada corretamente.")
 
+    logger.debug("Features calculadas com sucesso.")
     return data
 
 def main():
@@ -315,6 +287,7 @@ def main():
 
     symbols = SYMBOLS    
 
+    logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
     logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
 
     # Use filter_symbols para filtrar os dados conforme os símbolos selecionados
@@ -334,14 +307,18 @@ def main():
     # Gera e salva o gráfico de variabilidade
     plot_variability(filtered_data)
     logger.info("Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'")
+    logger.info("Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'")
 
     # Gera e salva o gráfico de variabilidade normalizada
     plot_normalized_variability(filtered_data)
+    logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
     logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
 
     # Gera e salva gráficos de tendências de preço por mês/ano
     plot_price_trends_by_month_year(filtered_data)
     logger.info("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
+    logger.info("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
 
 if __name__ == "__main__":
+    main()
     main()

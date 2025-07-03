@@ -17,7 +17,7 @@ PROCESSED_FILE = PROCESSED_DATA / 'cripto_data.csv'
 load_dotenv()
 
 # Define a quantidade de dias da simulação com base no .env
-TEST_PERIOD_DAYS = int(os.getenv("TEST_PERIOD_DAYS", "20"))
+TEST_PERIOD_DAYS = int(os.getenv("TEST_PERIOD_DAYS", "30"))
 SYMBOLS = os.getenv("SYMBOLS", "BTC/USDT").split(',')
 
 # Atualiza os modelos ativos com base no .env
