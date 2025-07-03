@@ -6,12 +6,18 @@ import matplotlib.ticker as mticker
 
 import os
 import sys
+import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
-from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients, calculate_standard_error_between_mlp_and_best, determine_best_equation, calculate_standard_error
+from src.utils import timing, filter_symbols, sanitize_symbol, get_current_datetime, calculate_correlation_coefficients, calculate_standard_error_between_mlp_and_best, determine_best_equation, calculate_standard_error, setup_logging
 from src.models import walk_forward_prediction, run_training_data
 from src.features import calculate_features
+
+setup_logging()
+
+# Configura o logger
+logger = logging.getLogger(__name__)
 
 '''
 Análise de Performance (com K-Fold): Manteremos sua validação K-Fold original para gerar a tabela de RMSE e provar a performance geral dos modelos.
@@ -44,9 +50,9 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     Executa o fluxo completo de simulação de investimento para um ativo e plota o resultado.
     Simula os últimos 'test_period_days' dias.
     """
-    print("\n" + "#"*60)
-    print(f"PARTE 2: SIMULAÇÃO DE INVESTIMENTO PARA {symbol_to_simulate}")
-    print("#"*60)
+    logger.info("#"*60)
+    logger.info(f"PARTE 2: SIMULAÇÃO DE INVESTIMENTO PARA {symbol_to_simulate}")
+    logger.info("#"*60)
 
     single_symbol_data = filter_symbols(data, [symbol_to_simulate])
     
@@ -64,7 +70,7 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     
     min_train_size = len(X_sim) - test_period_days
     if min_train_size < 100:
-        print("Erro: Não há dados suficientes para uma simulação com o período de teste solicitado.")
+        logger.error("Erro: Não há dados suficientes para uma simulação com o período de teste solicitado.")
         return
 
     y_test_sim = y_sim.iloc[min_train_size:]
@@ -83,13 +89,13 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
         y_pred_walk_forward = np.array(y_pred_walk_forward)[sorted_idx]
         capital_evolution = simulate_returns(y_test_sim, y_pred_walk_forward, initial_capital)
         ax.plot(dates_test_sim, capital_evolution, label=f'Estratégia {name}')
-        print(f"Capital final com {name}: U${capital_evolution[-1]:.2f}")
+        logger.info(f"Capital final com {name}: U${capital_evolution[-1]:.2f}")
 
     # Estratégia "Buy and Hold"
     y_test_values = y_test_sim.values
     hold_evolution = [initial_capital * (price / y_test_values[0]) for price in y_test_values]
     ax.plot(dates_test_sim, hold_evolution, label='Estratégia Buy and Hold', linestyle='--')
-    print(f"Capital final com Buy and Hold: U${hold_evolution[-1]:.2f}")
+    logger.info(f"Capital final com Buy and Hold: U${hold_evolution[-1]:.2f}")
 
     # Configurações do Gráfico
     ax.set_title(f'Evolução do Capital - Simulação Walk-Forward ({symbol_to_simulate})', fontsize=16)
@@ -141,30 +147,30 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     # - Compara o preço previsto com o preço real para simular decisões de compra/venda.
     # - Evolução do capital depende da precisão das previsões.
 
-    print("\n")
-    print("#################################################################")
-    print("Diferença entre Buy and Hold e Modelos (MLP, etc.):")
-    print("#################################################################")
-    print("\n")
-    print("Buy and Hold:")
-    print(" - Compra no início e mantém até o final.")
-    print(" - Evolução proporcional ao preço inicial e final.")
-    print("\n")
-    print("Modelos (MLP, etc.):")
-    print(" - Usa previsões para ajustar posições diariamente.")
-    print(" - Evolução depende da precisão das previsões.")
-    print("\n")
+    
+    logger.info("#################################################################")
+    logger.info("Diferença entre Buy and Hold e Modelos (MLP, etc.):")
+    logger.info("#################################################################")
+    
+    logger.info("Buy and Hold:")
+    logger.info(" - Compra no início e mantém até o final.")
+    logger.info(" - Evolução proporcional ao preço inicial e final.")
+    
+    logger.info("Modelos (MLP, etc.):")
+    logger.info(" - Usa previsões para ajustar posições diariamente.")
+    logger.info(" - Evolução depende da precisão das previsões.")
+    
 
     # Adiciona explicação sobre o cálculo do lucro com o modelo
-    print("\n")
-    print("#################################################################")
-    print("Computar o lucro obtido com seu modelo:")
-    print("#################################################################")
-    print("\n")
-    print("Caso tenha investido U$ 1,000.00 no primeiro dia de operação:")
-    print(" - Refazendo investimentos de todo o saldo acumulado diariamente.")
-    print(" - Apenas se a previsão do valor de fechamento do próximo dia for superior ao do dia atual.")
-    print("\n")
+    
+    logger.info("#################################################################")
+    logger.info("Computar o lucro obtido com seu modelo:")
+    logger.info("#################################################################")
+    
+    logger.info("Caso tenha investido U$ 1,000.00 no primeiro dia de operação:")
+    logger.info(" - Refazendo investimentos de todo o saldo acumulado diariamente.")
+    logger.info(" - Apenas se a previsão do valor de fechamento do próximo dia for superior ao do dia atual.")
+    
 
 
 def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
@@ -200,7 +206,7 @@ def main(data=None, models=None):
 
     # --- PARTE 1: Treinamento e Validação dos Modelos ---
     if models is not None and data is not None:
-        print("Usando modelos e dados fornecidos pelo usuário.")
+        logger.info("Usando modelos e dados fornecidos pelo usuário.")
     else:
         models, data = run_training_data()
 
@@ -209,38 +215,38 @@ def main(data=None, models=None):
     y = data['close']
 
     # --- PARTE 2: Chamada para a Simulação de Investimento ---
-    print("\n")
+    
     run_investment_simulation(data=data, symbol_to_simulate=SYMBOL_TO_SIMULATE, models=models, initial_capital=INITIAL_CAPITAL, test_period_days=TEST_PERIOD_DAYS)
 
     # --- PARTE 3: Análise dos Modelos ---
-    print("\n")
-    print("#################################################################")
-    print("Análise dos Modelos:")
-    print("#################################################################")
-    print("\n")
+    
+    logger.info("#################################################################")
+    logger.info("PARTE 3: Análise dos Modelos:")
+    logger.info("#################################################################")
+    
 
     # Gera o diagrama de dispersão
     plot_scatter_diagram(models, X, y)
 
     # Calcula os coeficientes de correlação
     correlations = calculate_correlation_coefficients(models, X, y)
-    print("Coeficientes de Correlação:")
+    logger.info("Coeficientes de Correlação:")
     for name, corr in correlations.items():
-        print(f" - {name}: {corr:.4f}")
+        logger.info(f" - {name}: {corr:.4f}")
 
     # Determina a melhor equação
     best_model_name, best_score = determine_best_equation(models, X, y)
-    print(f"Melhor Modelo: {best_model_name} com score {best_score:.4f}")
+    logger.info(f"Melhor Modelo: {best_model_name} com score {best_score:.4f}")
 
     # Calcula o erro padrão
     errors = calculate_standard_error(models, X, y)
-    print("Erro Padrão:")
+    logger.info("Erro Padrão:")
     for name, error in errors.items():
-        print(f" - {name}: {error:.4f}")
+        logger.info(f" - {name}: {error:.4f}")
 
     # Calcula o erro padrão entre MLP e o melhor regressor
     error_between_mlp_and_best = calculate_standard_error_between_mlp_and_best(models, X, y)
-    print(f"Erro Padrão entre MLP e {best_model_name}: {error_between_mlp_and_best:.4f}")
+    logger.info(f"Erro Padrão entre MLP e {best_model_name}: {error_between_mlp_and_best:.4f}")
 
 if __name__ == "__main__":
     main()
