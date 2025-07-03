@@ -13,21 +13,21 @@ setup_logging()
 
 if __name__ == "__main__":
     try:
-        #logging.info("Executando o pipeline de análise de criptomoedas...")
+        logging.info("Executando o pipeline de análise de criptomoedas...")
 
         # Carregar dados
-        data = data_load_main()
+        #data = data_load_main()
 
         # Calcular features
-        data_with_features = features_main()
+        #data_with_features = features_main()
 
         # Treinar modelos
         models, data_calculate = models_main()
 
         # Simular investimentos
-        simulate_main(data_calculate, models=models)
+        #simulate_main(data_calculate, models=models)
 
-        #logging.info("Pipeline concluído com sucesso.")
+        logging.info("Pipeline concluído com sucesso.")
     except Exception as e:
         logging.critical(f"Erro crítico durante a execução: {e}")
 

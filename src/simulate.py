@@ -39,7 +39,7 @@ def simulate_returns(y_test: pd.Series, y_pred: np.ndarray, initial_capital: flo
     return capital_evolution.tolist()
 
 @timing
-def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, models: dict, initial_capital: float = 1000.0, test_period_days: int = 10):
+def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, models: dict, initial_capital: float = 1000.0, test_period_days: int = 365):
     """
     Executa o fluxo completo de simulação de investimento para um ativo e plota o resultado.
     Simula os últimos 'test_period_days' dias.
@@ -110,6 +110,16 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     
     #plt.show()
     plt.close()
+
+    # Valida tipos de dados antes de plotar
+    if not np.issubdtype(dates_test_sim.dtype, np.datetime64):
+        raise ValueError("dates_test_sim deve ser do tipo datetime64.")
+
+    if not np.issubdtype(np.array(capital_evolution).dtype, np.float64):
+        raise ValueError("capital_evolution deve conter valores float válidos.")
+
+    if not np.issubdtype(np.array(hold_evolution).dtype, np.float64):
+        raise ValueError("hold_evolution deve conter valores float válidos.")
 
     # Ajusta o tamanho de 'dates_test_sim' para coincidir com 'capital_evolution'
     dates_test_sim = dates_test_sim[:len(capital_evolution)]
