@@ -55,7 +55,14 @@ def combine_csv_files(raw_folder: str, processed_file: str):
     logger.info(f"Arquivo combinado salvo com sucesso: {processed_file}")
 
 @timing
-def run_combine_csv_files(raw_folder, processed_file):
+def run_combine_csv_files(raw_folder: str, processed_file: str):
+    """
+    Executa o processo de combinação de arquivos CSV em um único arquivo processado.
+
+    Args:
+        raw_folder (str): Caminho para a pasta contendo os arquivos CSV brutos.
+        processed_file (str): Caminho para o arquivo combinado a ser salvo.
+    """
     logger.info("Executando a função run_combine_csv_files.")
     # Garante que a pasta processed existe
     os.makedirs(os.path.dirname(processed_file), exist_ok=True)

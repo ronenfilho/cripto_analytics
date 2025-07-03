@@ -25,7 +25,7 @@ def setup_logging():
         ]
     )
 
-def determine_best_equation(models, X, y):
+def determine_best_equation(models: dict, X: pd.DataFrame, y: pd.Series) -> tuple[str, float]:
     """
     Determina a equação que melhor representa os regressores.
     """
@@ -41,7 +41,7 @@ def determine_best_equation(models, X, y):
     return best_model, best_score
 
 
-def calculate_standard_error(models, X, y):
+def calculate_standard_error(models: dict, X: pd.DataFrame, y: pd.Series) -> dict:
     """
     Calcula o erro padrão para todos os modelos.
     """
@@ -55,7 +55,7 @@ def calculate_standard_error(models, X, y):
     return errors
 
 
-def calculate_standard_error_between_mlp_and_best(models, X, y):
+def calculate_standard_error_between_mlp_and_best(models: dict, X: pd.DataFrame, y: pd.Series) -> float:
     """
     Calcula o erro padrão entre o MLP e o melhor regressor.
     """
@@ -77,7 +77,7 @@ def calculate_standard_error_between_mlp_and_best(models, X, y):
     error = np.sqrt(mean_squared_error(y_pred_mlp, y_pred_best))
     return error
 
-def calculate_correlation_coefficients(models, X, y):
+def calculate_correlation_coefficients(models: dict, X: pd.DataFrame, y: pd.Series) -> dict:
     """
     Calcula os coeficientes de correlação para todos os modelos.
     """
@@ -90,7 +90,7 @@ def calculate_correlation_coefficients(models, X, y):
         correlations[name] = correlation
     return correlations
 
-def timing(func):
+def timing(func: callable) -> callable:
     """
     Decorator para medir o tempo de execução de uma função.
     """
@@ -114,7 +114,7 @@ def timing(func):
 
     return wrapper
 
-def filter_symbols(data: pd.DataFrame, symbols: list = None) -> pd.DataFrame:
+def filter_symbols(data: pd.DataFrame, symbols: list[str] = None) -> pd.DataFrame:
     """
     Filtra o DataFrame para incluir apenas os símbolos especificados ou lista todos se nenhum filtro for passado.
 

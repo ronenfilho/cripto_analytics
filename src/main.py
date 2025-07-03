@@ -1,3 +1,15 @@
+"""
+Este script orquestra o pipeline completo de análise de criptomoedas.
+
+Ele executa as seguintes etapas:
+1. Carrega os dados brutos e os processa.
+2. Calcula as features necessárias para análise.
+3. Treina os modelos de previsão.
+4. Simula estratégias de investimento com base nos modelos treinados.
+
+O objetivo é fornecer uma análise detalhada e simulações para auxiliar na tomada de decisões.
+"""
+
 import os
 import sys
 import logging

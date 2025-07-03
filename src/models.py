@@ -26,7 +26,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 @timing
-def walk_forward_prediction(model, X, y, min_train_size=30):
+def walk_forward_prediction(model: object, X: pd.DataFrame, y: pd.Series, min_train_size: int = 30) -> np.ndarray:
     """
     Gera previsões cronológicas usando a abordagem Walk-Forward (janela expansível),
     com logging de progresso.
@@ -101,7 +101,7 @@ def walk_forward_prediction(model, X, y, min_train_size=30):
 
 
 @timing
-def k_fold_validation(model, X, y, n_splits=5):
+def k_fold_validation(model: object, X: pd.DataFrame, y: pd.Series, n_splits: int = 5) -> float:
     """
     Aplica validação K-Fold ao modelo e retorna MSE médio.
     """
@@ -122,7 +122,7 @@ def k_fold_validation(model, X, y, n_splits=5):
 
 
 @timing
-def run_training_data():
+def run_training_data() -> tuple[dict, pd.DataFrame]:
     """
     Executa o fluxo completo de treinamento e validação dos modelos.
     """
