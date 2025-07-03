@@ -45,7 +45,7 @@ def simulate_returns(y_test: pd.Series, y_pred: np.ndarray, initial_capital: flo
     return capital_evolution.tolist()
 
 @timing
-def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, models: dict, initial_capital: float = 1000.0, test_period_days: int = 365):
+def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, models: dict, initial_capital: float = 1000.0, test_period_days: int = 365) -> None:
     """
     Executa o fluxo completo de simulação de investimento para um ativo e plota o resultado.
     Simula os últimos 'test_period_days' dias.
@@ -173,7 +173,7 @@ def run_investment_simulation(data: pd.DataFrame, symbol_to_simulate: str, model
     
 
 
-def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
+def plot_scatter_diagram(models: dict, X: pd.DataFrame, y: pd.Series, save_path: str = 'figures/scatter_diagram.png') -> None:
     """
     Gera um diagrama de dispersão para todos os modelos.
     Salva o gráfico na pasta figures.
@@ -201,7 +201,7 @@ def plot_scatter_diagram(models, X, y, save_path='figures/scatter_diagram.png'):
     #plt.show()
     plt.close()
 
-def main(data=None, models=None):
+def main(data: pd.DataFrame = None, models: dict = None) -> None:
     """Função principal para executar o fluxo de simulação de investimento e análise de modelos."""     
 
     # --- PARTE 1: Treinamento e Validação dos Modelos ---
