@@ -1,8 +1,5 @@
-import time
-import functools
 import pandas as pd
 import os
-import datetime
 import sys
 import numpy as np
 from sklearn.base import clone
@@ -157,8 +154,8 @@ def run_training_data() -> tuple[dict, pd.DataFrame]:
     logger.info('#################################################################')
     logger.info("PARTE 1: Análise de Performance com K-Fold (Legenda):")
     logger.info('#################################################################')
-    logger.info(f" - Erro médio quadrático (MSE)")
-    logger.info(f" - Raiz do erro médio quadrático (RMSE)")
+    logger.info(" - Erro médio quadrático (MSE)")
+    logger.info(" - Raiz do erro médio quadrático (RMSE)")
 
     logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
 

@@ -47,7 +47,6 @@ def simulate_returns(
 ) -> list:
     """Simula os retornos de uma estratégia de investimento."""
 
-    capital = initial_capital
     capital_evolution = [initial_capital]
     y_test_values = y_test.values
 

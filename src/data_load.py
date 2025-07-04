@@ -2,7 +2,6 @@ import os
 import sys
 import pandas as pd
 import logging
-import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.utils import timing, setup_logging
@@ -81,10 +80,8 @@ def main():
         logger.info("Iniciando o processo principal de combinação de CSVs.")
         run_combine_csv_files(RAW_DATA, PROCESSED_FILE)
     except Exception as e:
-        logger.exception("Ocorreu um erro inesperado durante a execução.")
-        print("Ocorreu um erro inesperado. Verifique os logs acima.")
+        logger.exception("Ocorreu um erro inesperado durante a execução.", e)
 
 
 if __name__ == "__main__":
-    main()
     main()

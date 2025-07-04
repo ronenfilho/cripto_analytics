@@ -1,16 +1,17 @@
-import pandas as pd
 import sys
 import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import pandas as pd
 import matplotlib.pyplot as plt
 import warnings
 import logging
+from src.config import PROCESSED_FILE, SYMBOLS
+from src.utils import timing, filter_symbols, setup_logging
 
 # Ignora todos os warnings
 warnings.filterwarnings("ignore")
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import PROCESSED_FILE, SYMBOLS
-from src.utils import timing, filter_symbols, setup_logging
 
 setup_logging()
 
@@ -106,7 +107,7 @@ def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
 
     logger.info('#################################################################')
     logger.info(
-        f"Analisar a variabilidade entre as criptomoedas com base nas medidas de dispersão."
+        "Analisar a variabilidade entre as criptomoedas com base nas medidas de dispersão."
     )
     logger.info('#################################################################')
 
@@ -225,7 +226,7 @@ def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
 
     logger.info('#################################################################')
     logger.info(
-        f"Construir gráfico de linha com o preço de fechamento destacando a média, mediana e moda ao longo do tempo."
+        "Construir gráfico de linha com o preço de fechamento destacando a média, mediana e moda ao longo do tempo."
     )
     logger.info('#################################################################')
 

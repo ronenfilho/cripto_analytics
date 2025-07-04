@@ -5,9 +5,12 @@ skip-string-normalization = true  # mantém aspas simples ou duplas como no orig
 
 [tool.ruff]
 line-length = 88
-target-version = "py311"
-select = ["E", "F", "B", "W"]  # principais regras de erros e boas práticas
-ignore = ["E501"]  # ignora alerta de linha muito longa
+
+[tool.ruff.lint]
+select = ["E", "F"]          # E: pycodestyle, F: pyflakes
+ignore = ["E501"]            # Exemplo: ignorar linha longa
+exclude = ["*.env"]
+
 
 [tool.ruff.format]
 docstring-code-format = true  # formata código dentro de docstrings

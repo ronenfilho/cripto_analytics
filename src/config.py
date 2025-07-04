@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv  # type: ignore
-from pathlib import Path
 
 # Diretório raiz
 ROOT_DIR = Path(__file__).resolve().parent.parent
