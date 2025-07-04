@@ -39,7 +39,7 @@ def combine_csv_files(raw_folder: str, processed_file: str):
     for file in csv_files:
         file_path = os.path.join(raw_folder, file)
         logger.debug(f"Lendo o arquivo: {file_path}")
-        df = pd.read_csv(file_path, skiprows=1)
+        df = pd.read_csv(file_path, skiprows=1, encoding="utf-8-sig")
         # Renomeia a 8ª coluna para 'Volume'
         if len(df.columns) >= 8:
             df.columns.values[7] = 'Volume'
