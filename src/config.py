@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-from dotenv import load_dotenv # type: ignore
+from dotenv import load_dotenv  # type: ignore
 from pathlib import Path
 
 # Diretório raiz
@@ -24,18 +24,19 @@ SYMBOLS = os.getenv("SYMBOLS", "BTC/USDT").split(',')
 MODELS = {
     "LinearRegression": os.getenv("USE_LINEAR_REGRESSION", "True").lower() == "true",
     "MLPRegressor": os.getenv("USE_MLP_REGRESSOR", "True").lower() == "true",
-    "PolynomialRegression": os.getenv("USE_POLYNOMIAL_REGRESSION", "True").lower() == "true",
-    #"DecisionTreeRegressor": os.getenv("USE_DECISION_TREE_REGRESSOR", "True").lower() == "true",
-    #"RandomForestRegressor": os.getenv("USE_RANDOM_FOREST_REGRESSOR", "True").lower() == "true",
-    #"XGBRegressor": os.getenv("USE_XGB_REGRESSOR", "True").lower() == "true",
-    #"CatBoostRegressor": os.getenv("USE_CATBOOST_REGRESSOR", "True").lower() == "true",
-    #"LightGBMRegressor": os.getenv("USE_LIGHTGBM_REGRESSOR", "True").lower() == "true",
-    #"AdaBoostRegressor": os.getenv("USE_ADA_BOOST_REGRESSOR", "True").lower() == "true",
-    #"GradientBoostingRegressor": os.getenv("USE_GRADIENT_BOOSTING_REGRESSOR", "True").lower() == "true",        
+    "PolynomialRegression": os.getenv("USE_POLYNOMIAL_REGRESSION", "True").lower()
+    == "true",
+    # "DecisionTreeRegressor": os.getenv("USE_DECISION_TREE_REGRESSOR", "True").lower() == "true",
+    # "RandomForestRegressor": os.getenv("USE_RANDOM_FOREST_REGRESSOR", "True").lower() == "true",
+    # "XGBRegressor": os.getenv("USE_XGB_REGRESSOR", "True").lower() == "true",
+    # "CatBoostRegressor": os.getenv("USE_CATBOOST_REGRESSOR", "True").lower() == "true",
+    # "LightGBMRegressor": os.getenv("USE_LIGHTGBM_REGRESSOR", "True").lower() == "true",
+    # "AdaBoostRegressor": os.getenv("USE_ADA_BOOST_REGRESSOR", "True").lower() == "true",
+    # "GradientBoostingRegressor": os.getenv("USE_GRADIENT_BOOSTING_REGRESSOR", "True").lower() == "true",
 }
 
 # Define se o modelo PolynomialRegression será utilizado com base no .env
-#USE_POLYNOMIAL_REGRESSION = str(os.getenv("USE_POLYNOMIAL_REGRESSION", "True")).lower() == "true"
+# USE_POLYNOMIAL_REGRESSION = str(os.getenv("USE_POLYNOMIAL_REGRESSION", "True")).lower() == "true"
 
 # Atualiza para suportar intervalo de graus para PolynomialRegression
 POLYNOMIAL_DEGREE_RANGE = os.getenv("POLYNOMIAL_DEGREE_RANGE", "2,5").split(',')
@@ -51,5 +52,3 @@ USE_TIMING = os.getenv("USE_TIMING", "True").lower() == "true"
 
 # Define o nível de logging com base no .env
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
-
-

@@ -48,11 +48,14 @@ def combine_csv_files(raw_folder: str, processed_file: str):
 
     # Combina todos os DataFrames em um único DataFrame
     combined_df = pd.concat(dataframes, ignore_index=True)
-    logger.info(f"Arquivos combinados com sucesso. Salvando no arquivo: {processed_file}")
+    logger.info(
+        f"Arquivos combinados com sucesso. Salvando no arquivo: {processed_file}"
+    )
 
     # Salva o DataFrame combinado no arquivo especificado
     combined_df.to_csv(processed_file, index=False)
     logger.info(f"Arquivo combinado salvo com sucesso: {processed_file}")
+
 
 @timing
 def run_combine_csv_files(raw_folder: str, processed_file: str):
@@ -71,6 +74,7 @@ def run_combine_csv_files(raw_folder: str, processed_file: str):
     combine_csv_files(raw_folder, processed_file)
     logging.info("Processo de combinação concluído.")
 
+
 def main():
     """Função principal para ser chamada por outros métodos."""
     try:
@@ -79,6 +83,7 @@ def main():
     except Exception as e:
         logger.exception("Ocorreu um erro inesperado durante a execução.")
         print("Ocorreu um erro inesperado. Verifique os logs acima.")
+
 
 if __name__ == "__main__":
     main()

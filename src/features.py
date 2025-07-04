@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 # Ignora logs do Matplotlib
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
 
+
 @timing
 def calculate_summary_statistics(data: pd.DataFrame) -> pd.DataFrame:
     """
@@ -41,6 +42,7 @@ def calculate_summary_statistics(data: pd.DataFrame) -> pd.DataFrame:
 
     logger.info("Função calculate_summary_statistics concluída com sucesso.")
     return grouped_stats
+
 
 @timing
 def generate_visualizations(data: pd.DataFrame) -> None:
@@ -89,6 +91,7 @@ def generate_visualizations(data: pd.DataFrame) -> None:
 
         logger.debug(f"Histograma salvo para o símbolo: {symbol}")
 
+
 @timing
 def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
     """
@@ -101,11 +104,11 @@ def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: DataFrame com a variabilidade (desvio padrão) de cada moeda.
     """
 
-    
     logger.info('#################################################################')
-    logger.info(f"Analisar a variabilidade entre as criptomoedas com base nas medidas de dispersão.")
+    logger.info(
+        f"Analisar a variabilidade entre as criptomoedas com base nas medidas de dispersão."
+    )
     logger.info('#################################################################')
-    
 
     logger.info("Iniciando a função compare_variability.")
     logger.debug(f"Tamanho do DataFrame recebido: {data.shape}")
@@ -117,6 +120,7 @@ def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
 
     logger.info("Função compare_variability concluída com sucesso.")
     return variability
+
 
 @timing
 def plot_variability(data: pd.DataFrame) -> None:
@@ -144,7 +148,9 @@ def plot_variability(data: pd.DataFrame) -> None:
     plt.tight_layout()
     plt.savefig("figures/variability_analysis_log.png", dpi=150)
     plt.close()
-    logger.info("Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'")
+    logger.info(
+        "Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'"
+    )
 
     # Gráfico de barras com variabilidade normalizada
     normalized_variability = variability.copy()
@@ -157,9 +163,12 @@ def plot_variability(data: pd.DataFrame) -> None:
     plt.ylabel("Variabilidade Normalizada")
     plt.savefig("figures/variability_analysis_normalized.png", dpi=150)
     plt.close()
-    logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
+    logger.info(
+        "Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'"
+    )
 
     logger.info("Função plot_variability concluída com sucesso.")
+
 
 @timing
 def plot_normalized_variability(data: pd.DataFrame) -> None:
@@ -173,24 +182,37 @@ def plot_normalized_variability(data: pd.DataFrame) -> None:
 
     variability = compare_variability(data)
     max_variability = variability['variability'].max()
-    variability['normalized_variability'] = variability['variability'] / max_variability * 100
+    variability['normalized_variability'] = (
+        variability['variability'] / max_variability * 100
+    )
 
     os.makedirs('figures', exist_ok=True)
 
     plt.figure(figsize=(12, 8))
-    bars = plt.bar(variability['symbol'], variability['normalized_variability'], color='skyblue')
+    bars = plt.bar(
+        variability['symbol'], variability['normalized_variability'], color='skyblue'
+    )
     plt.title("Variabilidade Normalizada entre as Criptomoedas")
     plt.xlabel("Symbol")
     plt.ylabel("Variabilidade Normalizada (%)")
     plt.xticks(rotation=45)
 
     for bar, value in zip(bars, variability['normalized_variability']):
-        plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{value:.1f}%", ha='center', va='bottom')
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height(),
+            f"{value:.1f}%",
+            ha='center',
+            va='bottom',
+        )
 
     plt.tight_layout()
     plt.savefig("figures/variability_analysis_normalized.png", dpi=150)
     plt.close()
-    logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'.")
+    logger.info(
+        "Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'."
+    )
+
 
 @timing
 def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
@@ -201,11 +223,11 @@ def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
     """
 
-    
     logger.info('#################################################################')
-    logger.info(f"Construir gráfico de linha com o preço de fechamento destacando a média, mediana e moda ao longo do tempo.")
+    logger.info(
+        f"Construir gráfico de linha com o preço de fechamento destacando a média, mediana e moda ao longo do tempo."
+    )
     logger.info('#################################################################')
-    
 
     # Garante que a pasta 'figures' existe
     os.makedirs('figures', exist_ok=True)
@@ -216,15 +238,49 @@ def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
 
     for symbol in symbols:
         symbol_data = data[data['symbol'] == symbol]
-        grouped_data = symbol_data.groupby('month_year')['close'].agg(['mean', 'median', lambda x: x.mode()[0] if not x.mode().empty else None, 'last']).reset_index()
+        grouped_data = (
+            symbol_data.groupby('month_year')['close']
+            .agg(
+                [
+                    'mean',
+                    'median',
+                    lambda x: x.mode()[0] if not x.mode().empty else None,
+                    'last',
+                ]
+            )
+            .reset_index()
+        )
         grouped_data.columns = ['month_year', 'mean', 'median', 'mode', 'close']
         sanitized_symbol = symbol.replace('/', '_')
 
         plt.figure(figsize=(16, 10))
-        plt.plot(grouped_data['month_year'].astype(str), grouped_data['mean'], label='Média', color='green', linestyle='--')
-        plt.plot(grouped_data['month_year'].astype(str), grouped_data['median'], label='Mediana', color='orange', linestyle='--')
-        plt.plot(grouped_data['month_year'].astype(str), grouped_data['mode'], label='Moda', color='red', linestyle='--')
-        plt.plot(grouped_data['month_year'].astype(str), grouped_data['close'], label='Preço de Fechamento', color='blue')
+        plt.plot(
+            grouped_data['month_year'].astype(str),
+            grouped_data['mean'],
+            label='Média',
+            color='green',
+            linestyle='--',
+        )
+        plt.plot(
+            grouped_data['month_year'].astype(str),
+            grouped_data['median'],
+            label='Mediana',
+            color='orange',
+            linestyle='--',
+        )
+        plt.plot(
+            grouped_data['month_year'].astype(str),
+            grouped_data['mode'],
+            label='Moda',
+            color='red',
+            linestyle='--',
+        )
+        plt.plot(
+            grouped_data['month_year'].astype(str),
+            grouped_data['close'],
+            label='Preço de Fechamento',
+            color='blue',
+        )
 
         plt.title(f"Tendências de Preço de Fechamento por Mês/Ano - {symbol}")
         plt.xlabel("Mês/Ano")
@@ -237,6 +293,7 @@ def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
         plt.close()
         logger.debug(f"Gráfico de tendências de preço salvo para o símbolo {symbol}.")
 
+
 @timing
 def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
     """
@@ -248,7 +305,9 @@ def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame com novas colunas de features.
     """
-    logger.info("Calculando features baseadas em séries temporais para previsão de preços.")
+    logger.info(
+        "Calculando features baseadas em séries temporais para previsão de preços."
+    )
 
     data = data.copy()
     data['return_1d'] = data['close'].pct_change(1)
@@ -262,9 +321,9 @@ def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
             rolling_max_7d=df['close'].rolling(window=7).max(),
             rolling_min_7d=df['close'].rolling(window=7).min(),
             momentum_7d=df['close'] - df['close'].shift(7),
-            volatility_7d=df['return_1d'].rolling(window=7).std()
+            volatility_7d=df['return_1d'].rolling(window=7).std(),
         ),
-        include_groups=False
+        include_groups=False,
     )
 
     data = data.rename(columns={'symbol_original': 'symbol'})
@@ -278,14 +337,15 @@ def calculate_features(data: pd.DataFrame) -> pd.DataFrame:
     logger.debug("Features calculadas com sucesso.")
     return data
 
+
 def main() -> None:
     """Função principal para ser chamada por outros métodos.
     Carrega os dados processados, filtra conforme os símbolos selecionados, calcula estatísticas resumo e gera visualizações.
     """
-    
+
     data = pd.read_csv(PROCESSED_FILE)
 
-    symbols = SYMBOLS    
+    symbols = SYMBOLS
 
     logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
     logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
@@ -306,18 +366,27 @@ def main() -> None:
 
     # Gera e salva o gráfico de variabilidade
     plot_variability(filtered_data)
-    logger.info("Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'")
-    logger.info("Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'")
+    logger.info(
+        "Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'"
+    )
+    logger.info(
+        "Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'"
+    )
 
     # Gera e salva o gráfico de variabilidade normalizada
     plot_normalized_variability(filtered_data)
-    logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
-    logger.info("Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'")
+    logger.info(
+        "Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'"
+    )
+    logger.info(
+        "Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'"
+    )
 
     # Gera e salva gráficos de tendências de preço por mês/ano
     plot_price_trends_by_month_year(filtered_data)
     logger.info("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
     logger.info("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
+
 
 if __name__ == "__main__":
     main()

@@ -12,6 +12,7 @@ import logging
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import USE_TIMING, LOG_LEVEL
 
+
 def setup_logging():
     # Define o nível de logging a partir do .env
     log_level = getattr(logging, LOG_LEVEL.upper(), logging.INFO)
@@ -19,13 +20,13 @@ def setup_logging():
     logging.basicConfig(
         level=log_level,
         format="%(asctime)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.FileHandler("app.log"),
-            logging.StreamHandler()
-        ]
+        handlers=[logging.FileHandler("app.log"), logging.StreamHandler()],
     )
 
-def determine_best_equation(models: dict, X: pd.DataFrame, y: pd.Series) -> tuple[str, float]:
+
+def determine_best_equation(
+    models: dict, X: pd.DataFrame, y: pd.Series
+) -> tuple[str, float]:
     """
     Determina a equação que melhor representa os regressores.
     """
@@ -55,7 +56,9 @@ def calculate_standard_error(models: dict, X: pd.DataFrame, y: pd.Series) -> dic
     return errors
 
 
-def calculate_standard_error_between_mlp_and_best(models: dict, X: pd.DataFrame, y: pd.Series) -> float:
+def calculate_standard_error_between_mlp_and_best(
+    models: dict, X: pd.DataFrame, y: pd.Series
+) -> float:
     """
     Calcula o erro padrão entre o MLP e o melhor regressor.
     """
@@ -73,11 +76,16 @@ def calculate_standard_error_between_mlp_and_best(models: dict, X: pd.DataFrame,
     y_pred_best = best_clone.predict(X)
 
     if np.array_equal(y_pred_mlp, y_pred_best):
-        print("Aviso: As previsões do MLP e do melhor modelo são idênticas, resultando em erro padrão 0.0.")
+        print(
+            "Aviso: As previsões do MLP e do melhor modelo são idênticas, resultando em erro padrão 0.0."
+        )
     error = np.sqrt(mean_squared_error(y_pred_mlp, y_pred_best))
     return error
 
-def calculate_correlation_coefficients(models: dict, X: pd.DataFrame, y: pd.Series) -> dict:
+
+def calculate_correlation_coefficients(
+    models: dict, X: pd.DataFrame, y: pd.Series
+) -> dict:
     """
     Calcula os coeficientes de correlação para todos os modelos.
     """
@@ -90,10 +98,12 @@ def calculate_correlation_coefficients(models: dict, X: pd.DataFrame, y: pd.Seri
         correlations[name] = correlation
     return correlations
 
+
 def timing(func: callable) -> callable:
     """
     Decorator para medir o tempo de execução de uma função.
     """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if USE_TIMING:
@@ -102,7 +112,9 @@ def timing(func: callable) -> callable:
             try:
                 result = func(*args, **kwargs)
                 elapsed = time.time() - start_time
-                print(f"{func.__name__} - Processamento concluído em {elapsed:.2f} segundos.")
+                print(
+                    f"{func.__name__} - Processamento concluído em {elapsed:.2f} segundos."
+                )
                 return result
             except Exception as e:
                 print(f"{func.__name__} - Erro durante o processamento: {e}")
@@ -113,6 +125,7 @@ def timing(func: callable) -> callable:
             return func(*args, **kwargs)
 
     return wrapper
+
 
 def filter_symbols(data: pd.DataFrame, symbols: list[str] = None) -> pd.DataFrame:
     """
@@ -130,6 +143,7 @@ def filter_symbols(data: pd.DataFrame, symbols: list[str] = None) -> pd.DataFram
     filtered_data = data[data['symbol'].isin(symbols)]
     return filtered_data
 
+
 def sanitize_symbol(symbol: str) -> str:
     """
     Substitui '/' por '_' no nome do símbolo.
@@ -142,6 +156,7 @@ def sanitize_symbol(symbol: str) -> str:
     """
     return symbol.replace('/', '_')
 
+
 def get_current_datetime() -> str:
     """
     Gera um prefixo com a data e hora atual no formato 'YYYYMMDD_HHMM'.
@@ -151,4 +166,3 @@ def get_current_datetime() -> str:
     """
 
     return datetime.datetime.now().strftime('%Y%m%d_%H%M')
-

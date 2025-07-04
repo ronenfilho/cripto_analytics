@@ -1,0 +1,13 @@
+[tool.black]
+line-length = 88  # número máximo de caracteres por linha
+target-version = ['py311']  # versão alvo do Python
+skip-string-normalization = true  # mantém aspas simples ou duplas como no original
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "B", "W"]  # principais regras de erros e boas práticas
+ignore = ["E501"]  # ignora alerta de linha muito longa
+
+[tool.ruff.format]
+docstring-code-format = true  # formata código dentro de docstrings
