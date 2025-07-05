@@ -151,9 +151,9 @@ def run_training_data() -> tuple[dict, pd.DataFrame]:
 
     # --- PARTE 1: Análise de Performance com K-Fold ---
 
-    logger.info('#################################################################')
+    logger.info("#################################################################")
     logger.info("PARTE 1: Análise de Performance com K-Fold (Legenda):")
-    logger.info('#################################################################')
+    logger.info("#################################################################")
     logger.info(" - Erro médio quadrático (MSE)")
     logger.info(" - Raiz do erro médio quadrático (RMSE)")
 
@@ -167,11 +167,11 @@ def run_training_data() -> tuple[dict, pd.DataFrame]:
 
     # Remove linhas com valores ausentes
     features_to_check = [
-        'mean_7d',
-        'std_7d',
-        'return_7d',
-        'momentum_7d',
-        'volatility_7d',
+        "mean_7d",
+        "std_7d",
+        "return_7d",
+        "momentum_7d",
+        "volatility_7d",
     ]
     data_calculate = data_calculate.dropna(subset=features_to_check)
     logger.debug(
@@ -180,9 +180,9 @@ def run_training_data() -> tuple[dict, pd.DataFrame]:
 
     # Define X e y
     X = data_calculate[
-        ['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']
+        ["mean_7d", "std_7d", "return_7d", "momentum_7d", "volatility_7d"]
     ]
-    y = data_calculate['close']
+    y = data_calculate["close"]
 
     # Filtra os modelos ativos
     active_models = {name: model for name, model in MODELS.items() if model}

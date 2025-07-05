@@ -31,7 +31,7 @@ def determine_best_equation(
     Determina a equação que melhor representa os regressores.
     """
     best_model = None
-    best_score = float('-inf')
+    best_score = float("-inf")
     for name, model in models.items():
         model_clone = clone(model)
         model_clone.fit(X, y)
@@ -62,7 +62,7 @@ def calculate_standard_error_between_mlp_and_best(
     """
     Calcula o erro padrão entre o MLP e o melhor regressor.
     """
-    mlp_model = models.get('MLPRegressor')
+    mlp_model = models.get("MLPRegressor")
     best_model_name, _ = determine_best_equation(models, X, y)
     best_model = models.get(best_model_name)
 
@@ -140,7 +140,7 @@ def filter_symbols(data: pd.DataFrame, symbols: list[str] = None) -> pd.DataFram
     """
     if symbols is None:
         return data
-    filtered_data = data[data['symbol'].isin(symbols)]
+    filtered_data = data[data["symbol"].isin(symbols)]
     return filtered_data
 
 
@@ -154,7 +154,7 @@ def sanitize_symbol(symbol: str) -> str:
     Returns:
         str: Nome do símbolo sanitizado.
     """
-    return symbol.replace('/', '_')
+    return symbol.replace("/", "_")
 
 
 def get_current_datetime() -> str:
@@ -165,4 +165,4 @@ def get_current_datetime() -> str:
         str: Prefixo com data e hora atual.
     """
 
-    return datetime.datetime.now().strftime('%Y%m%d_%H%M')
+    return datetime.datetime.now().strftime("%Y%m%d_%H%M")

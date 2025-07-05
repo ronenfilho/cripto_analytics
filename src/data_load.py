@@ -23,7 +23,7 @@ def combine_csv_files(raw_folder: str, processed_file: str):
     logger.info(f"Iniciando a combinação de arquivos CSV na pasta: {raw_folder}")
 
     # Lista todos os arquivos CSV na pasta raw
-    csv_files = [f for f in os.listdir(raw_folder) if f.endswith('.csv')]
+    csv_files = [f for f in os.listdir(raw_folder) if f.endswith(".csv")]
 
     # Verifica se há arquivos CSV na pasta
     if not csv_files:
@@ -42,7 +42,7 @@ def combine_csv_files(raw_folder: str, processed_file: str):
         df = pd.read_csv(file_path, skiprows=1, encoding="utf-8-sig")
         # Renomeia a 8ª coluna para 'Volume'
         if len(df.columns) >= 8:
-            df.columns.values[7] = 'Volume'
+            df.columns.values[7] = "Volume"
         dataframes.append(df)
 
     # Combina todos os DataFrames em um único DataFrame
@@ -80,7 +80,7 @@ def main():
         logger.info("Iniciando o processo principal de combinação de CSVs.")
         run_combine_csv_files(RAW_DATA, PROCESSED_FILE)
     except Exception as e:
-        logger.exception("Ocorreu um erro inesperado durante a execução.", e)
+        logger.exception("Ocorreu um erro inesperado durante a execução.", exc_info=e)
 
 
 if __name__ == "__main__":

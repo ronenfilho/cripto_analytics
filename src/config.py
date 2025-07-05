@@ -6,10 +6,10 @@ from dotenv import load_dotenv  # type: ignore
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
 # Diretórios de dados
-DATASET_DIR = ROOT_DIR / 'data'
-RAW_DATA = DATASET_DIR / 'raw'
-PROCESSED_DATA = DATASET_DIR / 'processed'
-PROCESSED_FILE = PROCESSED_DATA / 'cripto_data.csv'
+DATASET_DIR = ROOT_DIR / "data"
+RAW_DATA = DATASET_DIR / "raw"
+PROCESSED_DATA = DATASET_DIR / "processed"
+PROCESSED_FILE = PROCESSED_DATA / "cripto_data.csv"
 
 # Variáveis de configuração
 # Carrega variáveis de ambiente do arquivo .env
@@ -17,7 +17,7 @@ load_dotenv()
 
 # Define a quantidade de dias da simulação com base no .env
 TEST_PERIOD_DAYS = int(os.getenv("TEST_PERIOD_DAYS", "30"))
-SYMBOLS = os.getenv("SYMBOLS", "BTC/USDT").split(',')
+SYMBOLS = os.getenv("SYMBOLS", "BTC/USDT").split(",")
 
 # Atualiza os modelos ativos com base no .env
 MODELS = {
@@ -38,7 +38,7 @@ MODELS = {
 # USE_POLYNOMIAL_REGRESSION = str(os.getenv("USE_POLYNOMIAL_REGRESSION", "True")).lower() == "true"
 
 # Atualiza para suportar intervalo de graus para PolynomialRegression
-POLYNOMIAL_DEGREE_RANGE = os.getenv("POLYNOMIAL_DEGREE_RANGE", "2,5").split(',')
+POLYNOMIAL_DEGREE_RANGE = os.getenv("POLYNOMIAL_DEGREE_RANGE", "2,5").split(",")
 
 # Define o símbolo específico para simulação com base no .env
 SYMBOL_TO_SIMULATE = os.getenv("SYMBOL_TO_SIMULATE", "BTC/USDT")

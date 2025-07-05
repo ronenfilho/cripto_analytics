@@ -29,7 +29,7 @@ setup_logging()
 # Configura o logger
 logger = logging.getLogger(__name__)
 
-'''
+"""
 Análise de Performance (com K-Fold): Manteremos sua validação K-Fold original para gerar a tabela de RMSE e provar a performance geral dos modelos.
 
 Simulação de Investimento (com Walk-Forward): Para gerar as previsões necessárias para a simulação, usaremos uma técnica chamada Walk-Forward Validation (ou Validação de Janela Expansível). É o método correto para testar estratégias em séries temporais, pois funciona assim:
@@ -38,7 +38,7 @@ Treina com dados do dia 1 ao 100, prevê o dia 101.
 Treina com dados do dia 1 ao 101, prevê o dia 102.
 E assim por diante...
 Isso garante que cada previsão seja feita usando apenas dados do passado, simulando perfeitamente um ambiente real.
-'''
+"""
 
 
 @timing
@@ -80,16 +80,16 @@ def run_investment_simulation(
     single_symbol_data = filter_symbols(data, [symbol_to_simulate])
 
     # Garante que os dados estão ordenados por data em ordem crescente
-    single_symbol_data['date'] = pd.to_datetime(single_symbol_data['date'])
-    single_symbol_data = single_symbol_data.sort_values('date', ascending=True)
+    single_symbol_data["date"] = pd.to_datetime(single_symbol_data["date"])
+    single_symbol_data = single_symbol_data.sort_values("date", ascending=True)
 
     data_with_features = calculate_features(single_symbol_data)
     data_processed = data_with_features.dropna()
 
-    features_cols = ['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']
+    features_cols = ["mean_7d", "std_7d", "return_7d", "momentum_7d", "volatility_7d"]
     X_sim = data_processed[features_cols]
-    y_sim = data_processed['close']
-    dates_sim = pd.to_datetime(data_processed['date'])
+    y_sim = data_processed["close"]
+    dates_sim = pd.to_datetime(data_processed["date"])
 
     min_train_size = len(X_sim) - test_period_days
     if min_train_size < 100:
@@ -106,7 +106,7 @@ def run_investment_simulation(
     dates_test_sim = dates_test_sim.iloc[sorted_idx]
     y_test_sim = y_test_sim.iloc[sorted_idx]
 
-    plt.style.use('seaborn-v0_8-darkgrid')
+    plt.style.use("seaborn-v0_8-darkgrid")
     fig, ax = plt.subplots(figsize=(14, 8))
 
     for name, model in models.items():
@@ -117,7 +117,7 @@ def run_investment_simulation(
         capital_evolution = simulate_returns(
             y_test_sim, y_pred_walk_forward, initial_capital
         )
-        ax.plot(dates_test_sim, capital_evolution, label=f'Estratégia {name}')
+        ax.plot(dates_test_sim, capital_evolution, label=f"Estratégia {name}")
         logger.info(f"Capital final com {name}: U${capital_evolution[-1]:.2f}")
 
     # Estratégia "Buy and Hold"
@@ -126,29 +126,29 @@ def run_investment_simulation(
         initial_capital * (price / y_test_values[0]) for price in y_test_values
     ]
     ax.plot(
-        dates_test_sim, hold_evolution, label='Estratégia Buy and Hold', linestyle='--'
+        dates_test_sim, hold_evolution, label="Estratégia Buy and Hold", linestyle="--"
     )
     logger.info(f"Capital final com Buy and Hold: U${hold_evolution[-1]:.2f}")
 
     # Configurações do Gráfico
     ax.set_title(
-        f'Evolução do Capital - Simulação Walk-Forward ({symbol_to_simulate})',
+        f"Evolução do Capital - Simulação Walk-Forward ({symbol_to_simulate})",
         fontsize=16,
     )
-    ax.set_xlabel('Data', fontsize=12)
-    ax.set_ylabel('Capital Acumulado (U$)', fontsize=12)
+    ax.set_xlabel("Data", fontsize=12)
+    ax.set_ylabel("Capital Acumulado (U$)", fontsize=12)
     ax.legend(fontsize=10)
-    formatter = mticker.FormatStrFormatter('U$%.0f')
+    formatter = mticker.FormatStrFormatter("U$%.0f")
     ax.yaxis.set_major_formatter(formatter)
     fig.autofmt_xdate()
 
     # Garante que a pasta 'figures' existe
-    os.makedirs('figures', exist_ok=True)
+    os.makedirs("figures", exist_ok=True)
 
     file_name = f"{get_current_datetime()}_{sanitize_symbol(symbol_to_simulate)}_investment_simulation_{test_period_days}_days.png"
 
     # Salva o gráfico na pasta figures antes de mostrar
-    plt.savefig(f"figures/{file_name}", dpi=150, bbox_inches='tight')
+    plt.savefig(f"figures/{file_name}", dpi=150, bbox_inches="tight")
 
     # plt.show()
     plt.close()
@@ -214,13 +214,13 @@ def plot_scatter_diagram(
     models: dict,
     X: pd.DataFrame,
     y: pd.Series,
-    save_path: str = 'figures/scatter_diagram.png',
+    save_path: str = "figures/scatter_diagram.png",
 ) -> None:
     """
     Gera um diagrama de dispersão para todos os modelos.
     Salva o gráfico na pasta figures.
     """
-    plt.style.use('seaborn-v0_8-darkgrid')
+    plt.style.use("seaborn-v0_8-darkgrid")
     fig, ax = plt.subplots(figsize=(14, 8))
 
     for name, model in models.items():
@@ -229,16 +229,16 @@ def plot_scatter_diagram(
         y_pred = model_clone.predict(X)
         ax.scatter(y, y_pred, label=name, alpha=0.6)
 
-    ax.set_title('Diagrama de Dispersão - Modelos', fontsize=16)
-    ax.set_xlabel('Valores Reais', fontsize=12)
-    ax.set_ylabel('Valores Preditos', fontsize=12)
+    ax.set_title("Diagrama de Dispersão - Modelos", fontsize=16)
+    ax.set_xlabel("Valores Reais", fontsize=12)
+    ax.set_ylabel("Valores Preditos", fontsize=12)
     ax.legend(fontsize=10)
 
     # Atualiza o nome do arquivo para o scatter diagram
     scatter_file_name = f"{get_current_datetime()}_scatter_diagram.png"
 
     # Salva o gráfico na pasta figures antes de mostrar
-    plt.savefig(f"figures/{scatter_file_name}", dpi=150, bbox_inches='tight')
+    plt.savefig(f"figures/{scatter_file_name}", dpi=150, bbox_inches="tight")
 
     # plt.show()
     plt.close()
@@ -254,8 +254,8 @@ def main(data: pd.DataFrame = None, models: dict = None) -> None:
         models, data = run_training_data()
 
     # Define X e y para análise
-    X = data[['mean_7d', 'std_7d', 'return_7d', 'momentum_7d', 'volatility_7d']]
-    y = data['close']
+    X = data[["mean_7d", "std_7d", "return_7d", "momentum_7d", "volatility_7d"]]
+    y = data["close"]
 
     # --- PARTE 2: Chamada para a Simulação de Investimento ---
 
