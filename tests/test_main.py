@@ -1,50 +1,43 @@
-from src.data_load import main
-from unittest.mock import patch
-import logging
+from src.main import main
+import types
+from unittest.mock import patch, MagicMock
+import subprocess
 
 
-def test_main(tmp_path):
-    # Mock para variáveis globais e funções
-    with (
-        patch("src.data_load.RAW_DATA", str(tmp_path / "raw")),
-        patch(
-            "src.data_load.PROCESSED_FILE", str(tmp_path / "processed" / "combined.csv")
-        ),
-        patch("src.data_load.run_combine_csv_files") as mock_run,
-    ):
-        # Cria pastas e arquivos temporários
-        raw_folder = tmp_path / "raw"
-        raw_folder.mkdir()
-        processed_file = tmp_path / "processed" / "combined.csv"
+def test_main_pipeline_all_steps():
+    args = types.SimpleNamespace(
+        data=False,
+        features=False,
+        model=False,
+        simulate=False,
+        crypto=None,
+        days=None,
+        capital=None
+    )
 
-        # Executa a função principal
+    with patch("main.update_env_variable"), \
+         patch("config.TEST_PERIOD_DAYS", 30), \
+         patch("config.SYMBOLS", ["BTC/USDT"]), \
+         patch("main.logging.info"), \
+         patch("main.logging.critical"), \
+         patch("main.__name__", "__main__"), \
+         patch("sys.argv", ["main.py"]), \
+         patch("src.data_load.main") as mock_data, \
+         patch("src.features.main") as mock_feat, \
+         patch("src.models.main", return_value=(MagicMock(), MagicMock())) as mock_model, \
+         patch("src.simulate.main") as mock_sim:
+
+        # Simula a execução do pipeline
+        from src.main import main
         main()
 
-        # Verifica se a função run_combine_csv_files foi chamada corretamente
-        mock_run.assert_called_once_with(str(raw_folder), str(processed_file))
+        # Verifica se as etapas foram chamadas
+        mock_data.assert_called_once()
+        mock_feat.assert_called_once()
+        mock_model.assert_called_once()
+        mock_sim.assert_called_once()
 
 
-def test_main_with_exception(tmp_path, caplog):
-    # Mock para variáveis globais e funções
-    with (
-        patch("src.data_load.RAW_DATA", str(tmp_path / "raw")),
-        patch(
-            "src.data_load.PROCESSED_FILE", str(tmp_path / "processed" / "combined.csv")
-        ),
-        patch(
-            "src.data_load.run_combine_csv_files",
-            side_effect=Exception("Erro simulado"),
-        ) as mock_run,
-    ):
-        # Executa a função principal e captura logs
-        with caplog.at_level(logging.ERROR):
-            main()
-
-        # Verifica se a função run_combine_csv_files foi chamada
-        mock_run.assert_called_once()
-
-        # Verifica se o log de erro foi gerado
-        assert any(
-            "Ocorreu um erro inesperado durante a execução." in record.message
-            for record in caplog.records
-        )
+def test_run_as_script():
+    result = subprocess.run(["python", "-m", "src.main"], capture_output=True, text=True)
+    assert result.returncode == 0

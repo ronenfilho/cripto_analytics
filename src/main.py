@@ -67,7 +67,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
 
     try:
@@ -137,3 +137,7 @@ if __name__ == "__main__":
 
     except Exception as e:
         logging.critical(f"Erro crítico durante a execução: {e}")
+
+
+if __name__ == "__main__":
+    main()

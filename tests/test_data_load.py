@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 from unittest.mock import patch
 import logging
-import runpy
+import subprocess
 import warnings
 
 
@@ -111,4 +111,5 @@ def test_run_main_directly():
 
 
 def test_run_as_script():
-    runpy.run_module("src.data_load", run_name="__main__")
+    result = subprocess.run(["python", "-m", "src.data_load"], capture_output=True, text=True)
+    assert result.returncode == 0

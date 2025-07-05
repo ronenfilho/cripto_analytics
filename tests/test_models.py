@@ -1,6 +1,7 @@
 from src.models import walk_forward_prediction
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+import subprocess
 
 
 def test_walk_forward_prediction():
@@ -14,3 +15,4 @@ def test_walk_forward_prediction():
 
     # Verifica o resultado
     assert len(predictions) == 2  # Deve haver 2 previsões
+      
