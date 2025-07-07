@@ -61,7 +61,6 @@ if __name__ == "__main__":
     # Filtra apenas os dados onde o investimento foi realizado
     data_filtered = data[data['investment_made'] == 'Yes']
     
-    # Usa as variáveis carregadas do .env
     expected_return = EXPECTED_RETURN
     significance_level = SIGNIFICANCE_LEVEL
 
