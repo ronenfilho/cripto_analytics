@@ -9,7 +9,7 @@ import sys
 import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS
+from src.config import SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS, PROCESSED_DATA
 from src.utils import (
     timing,
     filter_symbols,
@@ -67,7 +67,7 @@ def run_investment_simulation(
     symbol_to_simulate: str,
     models: dict,
     initial_capital: float = 1000.0,
-    test_period_days: int = 365,
+    test_period_days: int = 30,
 ) -> None:
     """
     Executa o fluxo completo de simulação de investimento para um ativo e plota o resultado.
@@ -109,16 +109,63 @@ def run_investment_simulation(
     plt.style.use("seaborn-v0_8-darkgrid")
     fig, ax = plt.subplots(figsize=(14, 8))
 
+    strategy_results = []
+    bayes_houd_results = []
+    daily_returns = []
+
     for name, model in models.items():
         y_pred_walk_forward = walk_forward_prediction(
             model, X_sim, y_sim, min_train_size
         )
         y_pred_walk_forward = np.array(y_pred_walk_forward)[sorted_idx]
+
+        # Inicializa o capital acumulado para este modelo
+        accumulated_capital = initial_capital
+
+        # Calcula os retornos percentuais diários
+        for i in range(1, len(y_test_sim)):
+            date = dates_test_sim.iloc[i]
+            symbol = symbol_to_simulate
+            
+            # Usa o preço real para calcular o retorno
+            actual_return = (y_test_sim.iloc[i] - y_test_sim.iloc[i - 1]) / y_test_sim.iloc[i - 1]
+
+            # Lógica de reinvestimento diário baseada na previsão
+            investimento_realizado = y_pred_walk_forward[i] > y_pred_walk_forward[i - 1]
+            
+            # Valor reinvestido é o saldo do dia anterior
+            valor_reinvestido = accumulated_capital
+            
+            if investimento_realizado:                
+                accumulated_capital = accumulated_capital * (1 + actual_return)
+            else:
+                actual_return = 0.0
+
+            daily_returns.append({
+                "date": date,
+                "symbol": symbol,
+                "model": name,
+                "current_price": y_test_sim.iloc[i],
+                "prediction": y_pred_walk_forward[i],
+                "investment_made": "Yes" if investimento_realizado else "No",                
+                "reinvested_value": valor_reinvestido,
+                "final_value": accumulated_capital,
+                "return": actual_return,
+            })
+
         capital_evolution = simulate_returns(
             y_test_sim, y_pred_walk_forward, initial_capital
         )
         ax.plot(dates_test_sim, capital_evolution, label=f"Estratégia {name}")
         logger.info(f"Capital final com {name}: U${capital_evolution[-1]:.2f}")
+
+        # Adiciona resultados ao DataFrame de estratégia usando o valor final da simulação diária
+        strategy_results.append({
+            "crypto": symbol_to_simulate,
+            "initial_value": initial_capital,
+            "final_value": accumulated_capital,
+            "strategy": name,
+        })
 
     # Estratégia "Buy and Hold"
     y_test_values = y_test_sim.values
@@ -129,6 +176,40 @@ def run_investment_simulation(
         dates_test_sim, hold_evolution, label="Estratégia Buy and Hold", linestyle="--"
     )
     logger.info(f"Capital final com Buy and Hold: U${hold_evolution[-1]:.2f}")
+
+    # Adiciona resultados ao DataFrame de Bayes-Houd
+    bayes_houd_results.append({
+        "crypto": symbol_to_simulate,
+        "initial_value": initial_capital,
+        "final_value": hold_evolution[-1],
+        "strategy": "Buy and Hold",
+    })
+
+    # Salva os retornos diários em um arquivo CSV
+    returns_df = pd.DataFrame(daily_returns)    
+    returns_file = os.path.join(PROCESSED_DATA, "simulation_results_days.csv")
+    returns_df.to_csv(returns_file, index=False, float_format='%.4f')
+    print(f"Retornos diários salvos em: {returns_file}")
+
+    # Salva o arquivo combinado
+    combined_results = pd.DataFrame(strategy_results + bayes_houd_results)
+
+    # Adiciona colunas de data inicial, data final e quantidade de dias
+    start_date = dates_test_sim.iloc[0]
+    end_date = dates_test_sim.iloc[-1]
+    combined_results["start_date"] = start_date
+    combined_results["end_date"] = end_date
+    combined_results["days"] = (end_date - start_date).days + 1
+
+    combined_results["return"] = (
+        (combined_results["final_value"] - combined_results["initial_value"])
+        / combined_results["initial_value"]
+    )    
+
+    combined_results = combined_results.round(4)
+    output_file = os.path.join(PROCESSED_DATA, "simulation_results_consolidated.csv")
+    combined_results.to_csv(output_file, index=False)
+    print(f"Resultados combinados salvos em: {output_file}")
 
     # Configurações do Gráfico
     ax.set_title(
@@ -242,6 +323,52 @@ def plot_scatter_diagram(
 
     # plt.show()
     plt.close()
+
+
+def save_simulation_results(
+    strategy_results: pd.DataFrame, bayes_houd_results: pd.DataFrame, output_dir: str
+):
+    """
+    Salva os resultados da simulação em arquivos separados.
+
+    Args:
+        strategy_results (pd.DataFrame): DataFrame com os resultados da estratégia.
+        bayes_houd_results (pd.DataFrame): DataFrame com os resultados Bayes-Houd.
+        output_dir (str): Diretório onde os arquivos serão salvos.
+
+    Returns:
+        None
+    """
+    # Certifica-se de que o diretório de saída existe
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Define os caminhos dos arquivos
+    strategy_file = os.path.join(output_dir, "strategy_results.csv")
+    bayes_houd_file = os.path.join(output_dir, "bayes_houd_results.csv")
+
+    # Salva os DataFrames em arquivos CSV
+    strategy_results.to_csv(strategy_file, index=False)
+    bayes_houd_results.to_csv(bayes_houd_file, index=False)
+
+    print(f"Resultados da estratégia salvos em: {strategy_file}")
+    print(f"Resultados Bayes-Houd salvos em: {bayes_houd_file}")
+
+    # Combina os resultados em um único DataFrame
+    combined_results = pd.DataFrame(strategy_results + bayes_houd_results)
+
+    # Calcula a coluna de retorno como porcentagem
+    combined_results["return"] = (
+        (combined_results["final_value"] - combined_results["initial_value"]) / combined_results["initial_value"]
+    ) * 100
+
+    # Arredonda os valores para 2 casas decimais
+    combined_results = combined_results.round(2)
+
+    # Salva o arquivo combinado na pasta data/processed
+    output_file = os.path.join(PROCESSED_DATA, "simulation_results.csv")
+    combined_results.to_csv(output_file, index=False)
+
+    print(f"Resultados combinados salvos em: {output_file}")
 
 
 def main(data: pd.DataFrame = None, models: dict = None) -> None:

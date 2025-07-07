@@ -1,0 +1,6 @@
+crypto,initial_value,final_value,strategy,start_date,end_date,days,return
+BTC/USDT,1000.0,1050.0495,LinearRegression,2025-06-22,2025-06-24,3,0.05
+BTC/USDT,1000.0,1050.0495,MLPRegressor,2025-06-22,2025-06-24,3,0.05
+BTC/USDT,1000.0,1050.0495,PolynomialRegression_degree_2,2025-06-22,2025-06-24,3,0.05
+BTC/USDT,1000.0,1050.0495,PolynomialRegression_degree_3,2025-06-22,2025-06-24,3,0.05
+BTC/USDT,1000.0,1050.0495,Buy and Hold,2025-06-22,2025-06-24,3,0.05

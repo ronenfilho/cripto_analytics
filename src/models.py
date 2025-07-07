@@ -102,7 +102,7 @@ def walk_forward_prediction(
     y_future = y.iloc[min_train_size : min_train_size + total_days].values
     total_buys = np.sum(np.array(predictions) > y_future)
 
-    logger.info(f"\nPorcentagem de acerto: {accuracy_percentage:.2f}%")
+    logger.info(f"Porcentagem de acerto: {accuracy_percentage:.2f}%")
     logger.info(f"Porcentagem de erro: {error_percentage:.2f}%")
     logger.info(f"Total de compras sugeridas: {total_buys}/{total_days} dias")
 

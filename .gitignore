@@ -6,7 +6,7 @@
 data_/
 #*.csv
 *.nt
-data/processed/
+data/processed/cripto_data.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

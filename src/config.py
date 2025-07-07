@@ -19,6 +19,10 @@ load_dotenv()
 TEST_PERIOD_DAYS = int(os.getenv("TEST_PERIOD_DAYS", "30"))
 SYMBOLS = os.getenv("SYMBOLS", "BTC/USDT").split(",")
 
+# Variáveis para análise estatística
+EXPECTED_RETURN = float(os.getenv("EXPECTED_RETURN", "1.5"))  # em porcentagem
+SIGNIFICANCE_LEVEL = float(os.getenv("SIGNIFICANCE_LEVEL", "0.05"))
+
 # Atualiza os modelos ativos com base no .env
 MODELS = {
     "LinearRegression": os.getenv("USE_LINEAR_REGRESSION", "True").lower() == "true",
