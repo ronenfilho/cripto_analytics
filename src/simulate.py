@@ -8,7 +8,7 @@ import sys
 import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import SYMBOL_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS, PROCESSED_DATA
+from src.config import SYMBOLS_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS, PROCESSED_DATA 
 from src.utils import (
     timing,
     filter_symbols,    
@@ -18,6 +18,7 @@ from src.utils import (
     calculate_standard_error,
     setup_logging,
     simulate_returns,
+    delete_simulation_files,
 )
 from src.models import walk_forward_prediction, run_training_data
 from src.features import calculate_features
@@ -27,6 +28,7 @@ setup_logging()
 
 # Configura o logger
 logger = logging.getLogger(__name__)
+
 
 @timing
 def run_investment_simulation(
@@ -59,7 +61,7 @@ def run_investment_simulation(
     dates_sim = pd.to_datetime(data_processed["date"])
 
     min_train_size = len(X_sim) - test_period_days
-    if min_train_size < 100:
+    if min_train_size < 30:
         logger.error(
             "Erro: Não há dados suficientes para uma simulação com o período de teste solicitado."
         )
@@ -210,14 +212,14 @@ def run_simulation_core(
                 "date": date,
                 "symbol": symbol_to_simulate,
                 "strategy": name,
-                "current_price": round(current_price, 4),
-                "predicted_price": round(predicted_price, 4),
-                "next_price": round(next_price, 4),
+                "current_price": round(current_price, 2),
+                "predicted_price": round(predicted_price, 2),
+                "next_price": round(next_price, 2),
                 "investment_made": investment_made,
-                "capital_before": round(capital_before, 4),
-                "capital_invested": round(capital_invested, 4),
-                "capital_after": round(capital_after, 4),
-                "capital_gained": round(capital_gained, 4),
+                "capital_before": round(capital_before, 2),
+                "capital_invested": round(capital_invested, 2),
+                "capital_after": round(capital_after, 2),
+                "capital_gained": round(capital_gained, 2),
                 "return_pct": round(return_pct, 4)
             })
         
@@ -226,7 +228,7 @@ def run_simulation_core(
             "symbol": symbol_to_simulate,
             "strategy": name,
             "initial_value": initial_capital,
-            "final_value": current_capital,
+            "final_value": round(current_capital, 2),
             "return_pct": round((current_capital - initial_capital) / initial_capital, 4)
         })
         
@@ -254,14 +256,14 @@ def run_simulation_core(
             "date": date,
             "symbol": symbol_to_simulate,
             "strategy": "Buy and Hold",
-            "current_price": round(current_price, 4),
-            "predicted_price": round(current_price, 4),  # Buy and Hold não faz previsão
-            "next_price": round(next_price, 4),
+            "current_price": round(current_price, 2),
+            "predicted_price": round(current_price, 2),  # Buy and Hold não faz previsão
+            "next_price": round(next_price, 2),
             "investment_made": "Yes",  # Buy and Hold sempre investe
-            "capital_before": round(capital_before, 4),
-            "capital_invested": round(capital_invested, 4),
-            "capital_after": round(capital_after, 4),
-            "capital_gained": round(capital_gained, 4),
+            "capital_before": round(capital_before, 2),
+            "capital_invested": round(capital_invested, 2),
+            "capital_after": round(capital_after, 2),
+            "capital_gained": round(capital_gained, 2),
             "return_pct": round(return_pct, 4)
         })
     
@@ -270,36 +272,32 @@ def run_simulation_core(
         "symbol": symbol_to_simulate,
         "strategy": "Buy and Hold",
         "initial_value": initial_capital,
-        "final_value": hold_evolution[-1],
+        "final_value": round(hold_evolution[-1], 2),
         "return_pct": round((hold_evolution[-1] - initial_capital) / initial_capital, 4)
     }]
     
     logger.info(f"Capital final com Buy and Hold: U${hold_evolution[-1]:.2f}")
 
-    # Salva os retornos diários em um arquivo CSV
-    returns_df = pd.DataFrame(daily_returns)    
-    returns_file = os.path.join(PROCESSED_DATA, "simulation_results_days.csv")
-    returns_df.to_csv(returns_file, index=False, float_format='%.4f')
-    print(f"Retornos diários salvos em: {returns_file}")
-
-    # Salva o arquivo combinado
+    # Certifica-se de que os DataFrames estão definidos antes de salvar
+    returns_df = pd.DataFrame(daily_returns)
     combined_results = pd.DataFrame(strategy_results + bayes_houd_results)
 
-    # Adiciona colunas de data inicial, data final e quantidade de dias
-    start_date = dates_test_sim.iloc[0]
-    end_date = dates_test_sim.iloc[-1]
-    combined_results["start_date"] = start_date
-    combined_results["end_date"] = end_date
-    combined_results["days"] = (end_date - start_date).days + 1
+    # Salva os retornos diários em um arquivo CSV no modo append
+    returns_df["symbol"] = symbol_to_simulate  # Adiciona a coluna do símbolo
+    returns_file = os.path.join(PROCESSED_DATA, "simulation_results_days.csv")
+    if not os.path.exists(returns_file):
+        returns_df.to_csv(returns_file, index=False)
+    else:
+        returns_df.to_csv(returns_file, mode='a', header=False, index=False)
+    print(f"Retornos diários salvos em: {returns_file}")
 
-    combined_results["return"] = (
-        (combined_results["final_value"] - combined_results["initial_value"])
-        / combined_results["initial_value"]
-    )    
-
-    combined_results = combined_results.round(4)
+    # Salva o arquivo combinado no modo append
+    combined_results["symbol"] = symbol_to_simulate  # Adiciona a coluna do símbolo
     output_file = os.path.join(PROCESSED_DATA, "simulation_results_consolidated.csv")
-    combined_results.to_csv(output_file, index=False)
+    if not os.path.exists(output_file):
+        combined_results.to_csv(output_file, index=False)
+    else:
+        combined_results.to_csv(output_file, mode='a', header=False, index=False)
     print(f"Resultados combinados salvos em: {output_file}")
 
     return {
@@ -323,13 +321,21 @@ def main(data: pd.DataFrame = None, models: dict = None) -> None:
 
     # --- PARTE 2: Chamada para a Simulação de Investimento ---
 
-    run_investment_simulation(
-        data=data,
-        symbol_to_simulate=SYMBOL_TO_SIMULATE,
-        models=models,
-        initial_capital=INITIAL_CAPITAL,
-        test_period_days=TEST_PERIOD_DAYS,
-    )
+    # Deleta arquivos de simulação anteriores
+    delete_simulation_files()
+
+    # Itera sobre cada símbolo para realizar a simulação
+    for symbol in SYMBOLS_TO_SIMULATE:
+        logger.info(f"Iniciando simulação para {symbol}")
+        filtered_data = filter_symbols(data, [symbol])
+
+        run_investment_simulation(
+            data=filtered_data,
+            symbol_to_simulate=symbol,
+            models=models,
+            initial_capital=INITIAL_CAPITAL,
+            test_period_days=TEST_PERIOD_DAYS,
+        )
 
     # --- PARTE 3: Análise dos Modelos ---
 

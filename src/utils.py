@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error
 import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import USE_TIMING, LOG_LEVEL
+from src.config import USE_TIMING, LOG_LEVEL, PROCESSED_DATA
 
 
 # Configura o logger
@@ -225,6 +225,21 @@ def get_current_datetime() -> str:
     """
 
     return datetime.datetime.now().strftime("%Y%m%d_%H%M")
+
+def delete_simulation_files():
+    """Deleta os arquivos de resultados de simulação, se existirem."""
+    
+    files_to_delete = [
+        os.path.join(PROCESSED_DATA, "simulation_results_consolidated.csv"),
+        os.path.join(PROCESSED_DATA, "simulation_results_days.csv"),
+    ]
+
+    for file_path in files_to_delete:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"Arquivo deletado: {file_path}")
+        else:
+            print(f"Arquivo não encontrado: {file_path}")
 
 if __name__ == "__main__":
     setup_logging()

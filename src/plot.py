@@ -15,7 +15,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.utils import (
     timing,
     sanitize_symbol,
-    get_current_datetime,
     setup_logging,
     compare_variability,
 )
@@ -52,7 +51,7 @@ def plot_scatter_diagram(
     ax.legend(fontsize=10)
 
     # Atualiza o nome do arquivo para o scatter diagram
-    scatter_file_name = f"{get_current_datetime()}_scatter_diagram.png"
+    scatter_file_name = "scatter_diagram.png"
 
     # Salva o gráfico na pasta figures antes de mostrar
     plt.savefig(f"figures/{scatter_file_name}", dpi=150, bbox_inches="tight")
@@ -125,7 +124,7 @@ def plot_investment_simulation(
     # Garante que a pasta 'figures' existe
     os.makedirs("figures", exist_ok=True)
 
-    file_name = f"{get_current_datetime()}_{sanitize_symbol(symbol_to_simulate)}_investment_simulation_{test_period_days}_days.png"
+    file_name = f"{sanitize_symbol(symbol_to_simulate)}_investment_simulation_{test_period_days}_days.png"
 
     # Salva o gráfico na pasta figures
     plt.savefig(f"figures/{file_name}", dpi=150, bbox_inches="tight")

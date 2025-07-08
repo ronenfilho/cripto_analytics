@@ -44,8 +44,8 @@ MODELS = {
 # Atualiza para suportar intervalo de graus para PolynomialRegression
 POLYNOMIAL_DEGREE_RANGE = os.getenv("POLYNOMIAL_DEGREE_RANGE", "2,5").split(",")
 
-# Define o símbolo específico para simulação com base no .env
-SYMBOL_TO_SIMULATE = os.getenv("SYMBOL_TO_SIMULATE", "BTC/USDT")
+# Define os símbolos para simulação com base no .env
+SYMBOLS_TO_SIMULATE = os.getenv("SYMBOLS_TO_SIMULATE", "BTC/USDT").split(",")
 
 # Define o capital inicial para simulação com base no .env
 INITIAL_CAPITAL = float(os.getenv("INITIAL_CAPITAL", "1000.0"))
