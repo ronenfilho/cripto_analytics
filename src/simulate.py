@@ -28,7 +28,6 @@ setup_logging()
 # Configura o logger
 logger = logging.getLogger(__name__)
 
-
 @timing
 def run_investment_simulation(
     data: pd.DataFrame,
@@ -90,6 +89,7 @@ def run_investment_simulation(
     # Plota o gráfico da simulação
     plot_investment_simulation(
         models,
+        simulation_results["predictions"],  # Adicionado o argumento predictions
         X_sim,
         y_sim,
         dates_test_sim,
@@ -170,8 +170,138 @@ def run_simulation_core(
         capital_evolution = simulate_returns(
             y_test_sim, y_pred_walk_forward, initial_capital
         )
+        
+        # Armazena dados para uso posterior
+        models_evolution_data[name] = {
+            "capital_evolution": capital_evolution,
+            "predictions": y_pred_walk_forward
+        }
+        
+        # Calcula retornos diários para este modelo
+        y_test_values = y_test_sim.values
+        current_capital = initial_capital
+        
+        for i in range(len(y_test_values) - 1):
+            date = dates_test_sim.iloc[i]
+            current_price = y_test_values[i]
+            next_price = y_test_values[i + 1]
+            predicted_price = y_pred_walk_forward[i]
+            
+            # Verifica se deve investir (previsão > preço atual)
+            investment_made = "Yes" if predicted_price > current_price else "No"
+            
+            # Calcula retorno baseado na decisão de investir
+            if investment_made == "Yes":
+                return_pct = (next_price - current_price) / current_price
+                capital_before = current_capital
+                capital_invested = capital_before
+                capital_after = capital_before * (1 + return_pct)
+                capital_gained = capital_after - capital_before
+                current_capital = capital_after  # Atualiza o capital para o próximo dia
+            else:
+                return_pct = 0.0  # Sem investimento, sem retorno
+                capital_before = current_capital
+                capital_invested = 0.0
+                capital_after = current_capital  # Capital permanece igual
+                capital_gained = 0.0
+                # current_capital permanece igual
+            
+            daily_returns.append({
+                "date": date,
+                "symbol": symbol_to_simulate,
+                "strategy": name,
+                "current_price": round(current_price, 4),
+                "predicted_price": round(predicted_price, 4),
+                "next_price": round(next_price, 4),
+                "investment_made": investment_made,
+                "capital_before": round(capital_before, 4),
+                "capital_invested": round(capital_invested, 4),
+                "capital_after": round(capital_after, 4),
+                "capital_gained": round(capital_gained, 4),
+                "return_pct": round(return_pct, 4)
+            })
+        
+        # Adiciona aos resultados da estratégia
+        strategy_results.append({
+            "symbol": symbol_to_simulate,
+            "strategy": name,
+            "initial_value": initial_capital,
+            "final_value": current_capital,
+            "return_pct": round((current_capital - initial_capital) / initial_capital, 4)
+        })
+        
+        logger.info(f"Capital final com {name}: U${current_capital:.2f}")
 
-    # Retorna previsões junto com os resultados
+    # Estratégia "Buy and Hold"
+    y_test_values = y_test_sim.values
+    hold_evolution = [
+        initial_capital * (price / y_test_values[0]) for price in y_test_values
+    ]
+    
+    # Adiciona dados diários para Buy and Hold
+    for i in range(len(y_test_values) - 1):
+        date = dates_test_sim.iloc[i]
+        current_price = y_test_values[i]
+        next_price = y_test_values[i + 1]
+        
+        return_pct = (next_price - current_price) / current_price
+        capital_before = hold_evolution[i]
+        capital_after = hold_evolution[i + 1]
+        capital_invested = capital_before
+        capital_gained = capital_after - capital_before
+        
+        daily_returns.append({
+            "date": date,
+            "symbol": symbol_to_simulate,
+            "strategy": "Buy and Hold",
+            "current_price": round(current_price, 4),
+            "predicted_price": round(current_price, 4),  # Buy and Hold não faz previsão
+            "next_price": round(next_price, 4),
+            "investment_made": "Yes",  # Buy and Hold sempre investe
+            "capital_before": round(capital_before, 4),
+            "capital_invested": round(capital_invested, 4),
+            "capital_after": round(capital_after, 4),
+            "capital_gained": round(capital_gained, 4),
+            "return_pct": round(return_pct, 4)
+        })
+    
+    # Adiciona Buy and Hold aos resultados
+    bayes_houd_results = [{
+        "symbol": symbol_to_simulate,
+        "strategy": "Buy and Hold",
+        "initial_value": initial_capital,
+        "final_value": hold_evolution[-1],
+        "return_pct": round((hold_evolution[-1] - initial_capital) / initial_capital, 4)
+    }]
+    
+    logger.info(f"Capital final com Buy and Hold: U${hold_evolution[-1]:.2f}")
+
+    # Salva os retornos diários em um arquivo CSV
+    returns_df = pd.DataFrame(daily_returns)    
+    returns_file = os.path.join(PROCESSED_DATA, "simulation_results_days.csv")
+    returns_df.to_csv(returns_file, index=False, float_format='%.4f')
+    print(f"Retornos diários salvos em: {returns_file}")
+
+    # Salva o arquivo combinado
+    combined_results = pd.DataFrame(strategy_results + bayes_houd_results)
+
+    # Adiciona colunas de data inicial, data final e quantidade de dias
+    start_date = dates_test_sim.iloc[0]
+    end_date = dates_test_sim.iloc[-1]
+    combined_results["start_date"] = start_date
+    combined_results["end_date"] = end_date
+    combined_results["days"] = (end_date - start_date).days + 1
+
+    combined_results["return"] = (
+        (combined_results["final_value"] - combined_results["initial_value"])
+        / combined_results["initial_value"]
+    )    
+
+    combined_results = combined_results.round(4)
+    output_file = os.path.join(PROCESSED_DATA, "simulation_results_consolidated.csv")
+    combined_results.to_csv(output_file, index=False)
+    print(f"Resultados combinados salvos em: {output_file}")
+
     return {
         "predictions": predictions,
         "strategy_results": strategy_results,
