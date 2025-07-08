@@ -17,8 +17,8 @@ from src.utils import (
     sanitize_symbol,
     get_current_datetime,
     setup_logging,
+    compare_variability,
 )
-from src.models import walk_forward_prediction
 from src.utils import simulate_returns
 
 setup_logging()
@@ -130,3 +130,219 @@ def plot_investment_simulation(
     # Salva o gráfico na pasta figures
     plt.savefig(f"figures/{file_name}", dpi=150, bbox_inches="tight")
     logger.info(f"Gráfico salvo: figures/{file_name}")
+
+
+@timing
+def generate_visualizations(data: pd.DataFrame) -> None:
+    """
+    Gera boxplots e histogramas dos preços de fechamento agrupados por 'symbol'.
+
+    Args:
+        data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
+    """
+    logger.info("Iniciando a função generate_visualizations.")
+    logger.debug(f"Tamanho do DataFrame recebido: {data.shape}")
+    logger.debug(f"Colunas do DataFrame: {data.columns.tolist()}")
+
+    symbols = data["symbol"].unique()
+    logger.info(f"Símbolos encontrados: {symbols}")
+
+    os.makedirs("figures", exist_ok=True)
+
+    for symbol in symbols:
+        logger.info(f"Processando o símbolo: {symbol}")
+        symbol_data = data[data["symbol"] == symbol]
+
+        logger.debug(f"Tamanho dos dados para {symbol}: {symbol_data.shape}")
+
+        # Boxplot
+        plt.figure(figsize=(10, 6))
+        plt.boxplot(symbol_data["close"])
+        plt.title(f"Boxplot - {symbol}")
+        plt.xlabel("Symbol")
+        plt.ylabel("Preço de Fechamento")
+
+        sanitized_symbol = symbol.replace("/", "_")
+        plt.savefig(f"figures/{sanitized_symbol}_boxplot.png", dpi=150)
+        plt.close()
+        logger.info(f"Boxplot salvo para o símbolo: {symbol}")
+
+        # Histograma
+        plt.figure(figsize=(10, 6))
+        plt.hist(symbol_data["close"], bins=20, alpha=0.7)
+        plt.title(f"Histograma - {symbol}")
+        plt.xlabel("Preço de Fechamento")
+        plt.ylabel("Frequência")
+        plt.savefig(f"figures/{sanitized_symbol}_histogram.png", dpi=150)
+        plt.close()
+        logger.info(f"Histograma salvo para o símbolo: {symbol}")
+
+        logger.debug(f"Histograma salvo para o símbolo: {symbol}")
+
+
+@timing
+def plot_variability(variability: pd.DataFrame) -> None:
+    """
+    Cria e salva um gráfico de barras com a análise da variabilidade entre as criptomoedas.
+
+    Args:
+        data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
+    """
+    logger.info("Iniciando a função plot_variability.")
+
+    os.makedirs("figures", exist_ok=True)
+
+    plt.figure(figsize=(12, 8))
+    plt.bar(variability["symbol"], variability["variability"], color="skyblue")
+    plt.yscale("log")
+    plt.title("Variabilidade entre as criptomoedas (Escala Logarítmica)")
+    plt.xlabel("Symbol")
+    plt.ylabel("Desvio Padrão (Variabilidade)")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig("figures/variability_analysis_log.png", dpi=150)
+    plt.close()
+    logger.info(
+        "Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'"
+    )
+
+    # Gráfico de barras com variabilidade normalizada
+    normalized_variability = variability.copy()
+    normalized_variability["variability"] /= normalized_variability["variability"].max()
+
+    plt.figure(figsize=(12, 8))
+    plt.bar(normalized_variability["symbol"], normalized_variability["variability"])
+    plt.title("Análise de Variabilidade Normalizada")
+    plt.xlabel("Símbolo")
+    plt.ylabel("Variabilidade Normalizada")
+    plt.savefig("figures/variability_analysis_normalized.png", dpi=150)
+    plt.close()
+    logger.info(
+        "Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'"
+    )
+
+    logger.info("Função plot_variability concluída com sucesso.")
+
+
+@timing
+def plot_normalized_variability(data: pd.DataFrame) -> None:
+    """
+    Cria e salva um gráfico de barras com a variabilidade normalizada e anotações.
+
+    Args:
+        data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
+    """
+    logger.info("Criando gráfico de variabilidade normalizada entre as criptomoedas.")
+
+    variability = compare_variability(data)
+    max_variability = variability["variability"].max()
+    variability["normalized_variability"] = (
+        variability["variability"] / max_variability * 100
+    )
+
+    os.makedirs("figures", exist_ok=True)
+
+    plt.figure(figsize=(12, 8))
+    bars = plt.bar(
+        variability["symbol"], variability["normalized_variability"], color="skyblue"
+    )
+    plt.title("Variabilidade Normalizada entre as Criptomoedas")
+    plt.xlabel("Symbol")
+    plt.ylabel("Variabilidade Normalizada (%)")
+    plt.xticks(rotation=45)
+
+    for bar, value in zip(bars, variability["normalized_variability"]):
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height(),
+            f"{value:.1f}%",
+            ha="center",
+            va="bottom",
+        )
+
+    plt.tight_layout()
+    plt.savefig("figures/variability_analysis_normalized.png", dpi=150)
+    plt.close()
+    logger.info(
+        "Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'."
+    )
+
+
+@timing
+def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
+    """
+    Cria e salva gráficos de linha por símbolo agrupados por mês e ano com o preço de fechamento destacando média, mediana e moda.
+
+    Args:
+        data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
+    """
+
+    logger.info("#################################################################")
+    logger.info(
+        "Construir gráfico de linha com o preço de fechamento destacando a média, mediana e moda ao longo do tempo."
+    )
+    logger.info("#################################################################")
+
+    # Garante que a pasta 'figures' existe
+    os.makedirs("figures", exist_ok=True)
+    data["date"] = pd.to_datetime(data["date"])
+    data["month_year"] = data["date"].dt.to_period("M")
+
+    symbols = data["symbol"].unique()
+
+    for symbol in symbols:
+        symbol_data = data[data["symbol"] == symbol]
+        grouped_data = (
+            symbol_data.groupby("month_year")["close"]
+            .agg(
+                [
+                    "mean",
+                    "median",
+                    lambda x: x.mode()[0] if not x.mode().empty else None,
+                    "last",
+                ]
+            )
+            .reset_index()
+        )
+        grouped_data.columns = ["month_year", "mean", "median", "mode", "close"]
+        sanitized_symbol = symbol.replace("/", "_")
+
+        plt.figure(figsize=(16, 10))
+        plt.plot(
+            grouped_data["month_year"].astype(str),
+            grouped_data["mean"],
+            label="Média",
+            color="green",
+            linestyle="--",
+        )
+        plt.plot(
+            grouped_data["month_year"].astype(str),
+            grouped_data["median"],
+            label="Mediana",
+            color="orange",
+            linestyle="--",
+        )
+        plt.plot(
+            grouped_data["month_year"].astype(str),
+            grouped_data["mode"],
+            label="Moda",
+            color="red",
+            linestyle="--",
+        )
+        plt.plot(
+            grouped_data["month_year"].astype(str),
+            grouped_data["close"],
+            label="Preço de Fechamento",
+            color="blue",
+        )
+
+        plt.title(f"Tendências de Preço de Fechamento por Mês/Ano - {symbol}")
+        plt.xlabel("Mês/Ano")
+        plt.ylabel("Preço de Fechamento")
+        plt.legend()
+        plt.xticks(rotation=45, ha="right")
+        plt.grid(axis="y", linestyle="--", alpha=0.7)
+        plt.tight_layout()
+        plt.savefig(f"figures/{sanitized_symbol}_price_trends_month_year.png", dpi=150)
+        plt.close()
+        logger.debug(f"Gráfico de tendências de preço salvo para o símbolo {symbol}.")

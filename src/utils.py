@@ -12,6 +12,10 @@ import logging
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import USE_TIMING, LOG_LEVEL
 
+
+# Configura o logger
+logger = logging.getLogger(__name__)
+
 def timing(func: callable) -> callable:
     """
     Decorator para medir o tempo de execução de uma função.
@@ -38,6 +42,35 @@ def timing(func: callable) -> callable:
             return func(*args, **kwargs)
 
     return wrapper
+
+@timing
+def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Realiza uma análise comparativa da variabilidade entre as moedas.
+
+    Args:
+        data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
+
+    Returns:
+        pd.DataFrame: DataFrame com a variabilidade (desvio padrão) de cada moeda.
+    """
+
+    logger.info("#################################################################")
+    logger.info(
+        "Analisar a variabilidade entre as criptomoedas com base nas medidas de dispersão."
+    )
+    logger.info("#################################################################")
+
+    logger.info("Iniciando a função compare_variability.")
+    logger.debug(f"Tamanho do DataFrame recebido: {data.shape}")
+    logger.debug(f"Colunas do DataFrame: {data.columns.tolist()}")
+
+    variability = data.groupby("symbol")["close"].std().reset_index()
+    variability.columns = ["symbol", "variability"]
+    logger.debug(f"Variabilidade calculada: {variability}")
+
+    logger.info("Função compare_variability concluída com sucesso.")
+    return variability
 
 
 
@@ -192,3 +225,6 @@ def get_current_datetime() -> str:
     """
 
     return datetime.datetime.now().strftime("%Y%m%d_%H%M")
+
+if __name__ == "__main__":
+    setup_logging()
