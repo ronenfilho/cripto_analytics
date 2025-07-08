@@ -349,7 +349,6 @@ def main() -> None:
     symbols = SYMBOLS
 
     logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
-    logger.info(f"Símbolo: {symbols if symbols else 'Todos'}")
 
     # Use filter_symbols para filtrar os dados conforme os símbolos selecionados
     filtered_data = filter_symbols(data, symbols if symbols else None)
@@ -370,25 +369,19 @@ def main() -> None:
     logger.info(
         "Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'"
     )
-    logger.info(
-        "Gráfico de variabilidade salvo em 'figures/variability_analysis_log.png'"
-    )
+
 
     # Gera e salva o gráfico de variabilidade normalizada
     plot_normalized_variability(filtered_data)
     logger.info(
         "Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'"
     )
-    logger.info(
-        "Gráfico de variabilidade normalizada salvo em 'figures/variability_analysis_normalized.png'"
-    )
+
 
     # Gera e salva gráficos de tendências de preço por mês/ano
     plot_price_trends_by_month_year(filtered_data)
     logger.info("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
-    logger.info("Gráficos de tendências de preço por mês/ano salvos na pasta 'figures'")
 
 
 if __name__ == "__main__":
-    main()
     main()

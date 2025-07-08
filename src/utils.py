@@ -12,6 +12,60 @@ import logging
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import USE_TIMING, LOG_LEVEL
 
+def timing(func: callable) -> callable:
+    """
+    Decorator para medir o tempo de execução de uma função.
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if USE_TIMING:
+            print(f"{func.__name__} - Iniciando processamento...")
+            start_time = time.time()
+            try:
+                result = func(*args, **kwargs)
+                elapsed = time.time() - start_time
+                print(
+                    f"{func.__name__} - Processamento concluído em {elapsed:.2f} segundos."
+                )
+                return result
+            except Exception as e:
+                print(f"{func.__name__} - Erro durante o processamento: {e}")
+                raise
+            finally:
+                print(f"{func.__name__} - Finalizando execução.")
+        else:
+            return func(*args, **kwargs)
+
+    return wrapper
+
+
+
+@timing
+def simulate_returns(
+    y_test: pd.Series, y_pred: np.ndarray, initial_capital: float = 1000.0
+) -> list:
+    """
+    Simula os retornos de uma estratégia de investimento.
+    Args:
+        y_test (pd.Series): Série temporal contendo os valores reais do ativo financeiro.
+        y_pred (np.ndarray): Array contendo as previsões do modelo para os valores do ativo financeiro.
+        initial_capital (float, optional): Capital inicial para a simulação. O valor padrão é 1000.0.
+    Returns:
+        list: Lista contendo a evolução do capital ao longo do tempo, com base nos retornos simulados.
+    """
+
+    capital_evolution = [initial_capital]
+    y_test_values = y_test.values
+
+    daily_returns = np.where(
+        y_pred[1:] > y_test_values[:-1], y_test_values[1:] / y_test_values[:-1], 1
+    )
+    capital_evolution = np.concatenate(
+        ([initial_capital], initial_capital * np.cumprod(daily_returns))
+    )
+
+    return capital_evolution.tolist()
 
 def setup_logging():
     # Define o nível de logging a partir do .env
@@ -97,34 +151,6 @@ def calculate_correlation_coefficients(
         correlation = np.corrcoef(y, y_pred)[0, 1]
         correlations[name] = correlation
     return correlations
-
-
-def timing(func: callable) -> callable:
-    """
-    Decorator para medir o tempo de execução de uma função.
-    """
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        if USE_TIMING:
-            print(f"{func.__name__} - Iniciando processamento...")
-            start_time = time.time()
-            try:
-                result = func(*args, **kwargs)
-                elapsed = time.time() - start_time
-                print(
-                    f"{func.__name__} - Processamento concluído em {elapsed:.2f} segundos."
-                )
-                return result
-            except Exception as e:
-                print(f"{func.__name__} - Erro durante o processamento: {e}")
-                raise
-            finally:
-                print(f"{func.__name__} - Finalizando execução.")
-        else:
-            return func(*args, **kwargs)
-
-    return wrapper
 
 
 def filter_symbols(data: pd.DataFrame, symbols: list[str] = None) -> pd.DataFrame:

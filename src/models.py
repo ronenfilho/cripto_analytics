@@ -70,13 +70,13 @@ def walk_forward_prediction(
         action = "Compra realizada" if pred > current_price else "Sem compra"
 
         # Calcula o saldo acumulado (simulação simples)
-        if i == 0:
-            accumulated_balance = INITIAL_CAPITAL
-        else:
-            previous_price = y.iloc[test_index[0] - 1]
-            accumulated_balance *= (
-                (current_price / previous_price) if action == "Compra realizada" else 1
-            )
+        if i < len(y) - min_train_size - 1:  # Verifica se há um próximo preço
+            next_price = y.iloc[test_index[0] + 1]
+            if action == "Compra realizada":
+                # Aplica o retorno baseado no próximo preço
+                return_rate = next_price / current_price
+                accumulated_balance *= return_rate
+            # Se não comprou, o saldo permanece igual
 
         # Imprime o status do progresso a cada 1 dia ou no último dia
         if (i + 1) % 1 == 0 or (i + 1) == n_splits:
