@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.base import clone
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import os
 import sys
 
@@ -134,7 +135,7 @@ def plot_investment_simulation(
 @timing
 def generate_visualizations(data: pd.DataFrame) -> None:
     """
-    Gera boxplots e histogramas dos preços de fechamento agrupados por 'symbol'.
+    Gera visualizações combinadas de histogramas e boxplots dos preços de fechamento agrupados por 'symbol'.
 
     Args:
         data (pd.DataFrame): DataFrame contendo os dados das criptomoedas.
@@ -154,29 +155,27 @@ def generate_visualizations(data: pd.DataFrame) -> None:
 
         logger.debug(f"Tamanho dos dados para {symbol}: {symbol_data.shape}")
 
-        # Boxplot
-        plt.figure(figsize=(10, 6))
-        plt.boxplot(symbol_data["close"])
-        plt.title(f"Boxplot - {symbol}")
-        plt.xlabel("Symbol")
-        plt.ylabel("Preço de Fechamento")
-
         sanitized_symbol = symbol.replace("/", "_")
-        plt.savefig(f"figures/{sanitized_symbol}_boxplot.png", dpi=150)
-        plt.close()
-        logger.info(f"Boxplot salvo para o símbolo: {symbol}")
+
+        # Subplots: Histograma à esquerda e Boxplot à direita
+        fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
         # Histograma
-        plt.figure(figsize=(10, 6))
-        plt.hist(symbol_data["close"], bins=20, alpha=0.7)
-        plt.title(f"Histograma - {symbol}")
-        plt.xlabel("Preço de Fechamento")
-        plt.ylabel("Frequência")
-        plt.savefig(f"figures/{sanitized_symbol}_histogram.png", dpi=150)
-        plt.close()
-        logger.info(f"Histograma salvo para o símbolo: {symbol}")
+        axes[0].hist(symbol_data["close"], bins=20, alpha=0.7, color="skyblue")
+        axes[0].set_title(f"Histograma - {symbol}")
+        axes[0].set_xlabel("Preço de Fechamento")
+        axes[0].set_ylabel("Frequência")
 
-        logger.debug(f"Histograma salvo para o símbolo: {symbol}")
+        # Boxplot
+        axes[1].boxplot(symbol_data["close"])
+        axes[1].set_title(f"Boxplot - {symbol}")
+        axes[1].set_xlabel("Preço de Fechamento")
+
+        # Ajusta layout e salva o gráfico
+        plt.tight_layout()
+        plt.savefig(f"figures/{sanitized_symbol}_visual_histogram_boxplot.png", dpi=150)
+        plt.close()
+        logger.info(f"Visualizações combinadas salvas para o símbolo: {symbol}")
 
 
 @timing
@@ -306,7 +305,7 @@ def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
         grouped_data.columns = ["month_year", "mean", "median", "mode", "close"]
         sanitized_symbol = symbol.replace("/", "_")
 
-        plt.figure(figsize=(16, 10))
+        plt.figure(figsize=(20, 10))
         plt.plot(
             grouped_data["month_year"].astype(str),
             grouped_data["mean"],
@@ -335,12 +334,15 @@ def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
             color="blue",
         )
 
+        ax = plt.gca()
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=48))
+
         plt.title(f"Tendências de Preço de Fechamento por Mês/Ano - {symbol}")
         plt.xlabel("Mês/Ano")
         plt.ylabel("Preço de Fechamento")
         plt.legend()
-        plt.xticks(rotation=45, ha="right")
-        plt.grid(axis="y", linestyle="--", alpha=0.7)
+        plt.xticks(rotation=45, ha="right", fontsize=10)
+        plt.grid(axis="y", linestyle="--", alpha=0.7)        
         plt.tight_layout()
         plt.savefig(f"figures/{sanitized_symbol}_price_trends_month_year.png", dpi=150)
         plt.close()
