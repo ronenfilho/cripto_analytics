@@ -49,7 +49,11 @@ def parse_args():
         action="store_true",
         help="(4) Executa a simulação de investimento",
     )
-    # TODO
+    parser.add_argument(
+        "--analysis",
+        action="store_true",
+        help="(5) Executa a analise estastística dos dados (Teste de Hitótese e Analise da Variância)",
+    )    
     parser.add_argument("--days", type=int, help="Quantidade de dias para a simulação")
     parser.add_argument("--capital", type=float, help="Capital inicial para simulação")
     parser.add_argument(
@@ -94,6 +98,7 @@ def main():
         from src.features import main as features_main
         from src.models import main as models_main
         from src.simulate import main as simulate_main
+        from src.analysis import main as analysis_main
 
         # Verificar quais etapas executar com base nos argumentos
         if args.crypto or args.model or args.days or args.capital:
@@ -123,8 +128,12 @@ def main():
             models, data_calculate = models_main()
             simulate_main(data_calculate, models=models)
 
+        if args.analysis:
+            logging.info("Executando etapa de análises estastísticas...")
+            analysis_main()
+
         # Verifica se argumentos foram passados, caso contrário, processa todos
-        if not any([args.data, args.features, args.model, args.simulate]):
+        if not any([args.data, args.features, args.model, args.simulate, args.analysis]):
             logging.info(
                 "Nenhum argumento fornecido do pipeline. Processando todas as etapas do pipeline..."
             )

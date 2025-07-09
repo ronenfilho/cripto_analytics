@@ -70,7 +70,7 @@ def hypothesis_test_by_strategy(data: pd.DataFrame, expected_return: float, sign
 
     return results
 
-if __name__ == "__main__":
+def main() -> None:
     # Carrega os dados de simulação
     data = load_simulation_results()
     
@@ -114,3 +114,6 @@ if __name__ == "__main__":
         print(f"  p-valor: {result['p_value']:.4f}")
         print(f"  Conclusão: {result['conclusion']}")
         print("-" * 40)
+
+if __name__ == "__main__":
+    main()
