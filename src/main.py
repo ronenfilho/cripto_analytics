@@ -140,7 +140,8 @@ def main():
             data_load_main()
             features_main()
             models, data_calculate = models_main()
-            simulate_main(data_calculate, models=models)
+            simulate_main(data_calculate, models=models)                        
+            analysis_main()
 
         logging.info("Pipeline concluído com sucesso.")
 
