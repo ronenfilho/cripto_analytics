@@ -1,0 +1,1075 @@
+================================================================================
+ANÁLISE ANOVA - CRIPTOMOEDAS INDIVIDUAIS
+================================================================================
+
+Tipo de Análise: ANOVA
+Descrição do Teste: Comparação de retornos médios diários entre criptomoedas individuais
+
+CRIPTOMOEDAS ANALISADAS:
+----------------------------------------
+1. BCH/USDT - Buy and Hold
+2. BTC/USDT - Buy and Hold
+3. DASH/USDT - Buy and Hold
+4. DASH/USDT - LinearRegression
+5. DASH/USDT - MLPRegressor
+6. DASH/USDT - PolynomialRegression_degree_3
+7. EOS/USDT - Buy and Hold
+8. ETC/USDT - Buy and Hold
+9. ETH/USDT - Buy and Hold
+10. LTC/USDT - Buy and Hold
+11. LTC/USDT - PolynomialRegression_degree_3
+12. XMR/USDT - Buy and Hold
+13. XMR/USDT - LinearRegression
+14. XMR/USDT - MLPRegressor
+15. XMR/USDT - PolynomialRegression_degree_2
+16. XMR/USDT - PolynomialRegression_degree_3
+17. XRP/USDT - Buy and Hold
+18. ZRX/USDT - Buy and Hold
+19. ZRX/USDT - MLPRegressor
+
+RESULTADOS DA ANOVA:
+----------------------------------------
+Estatística F: 3.9283
+Valor p: 0.0024
+Significativo: Sim
+Conclusão: Há diferença significativa entre as combinações de criptomoedas e estratégias
+
+INTERPRETAÇÃO:
+----------------------------------------
+H0 (Hipótese Nula): Os retornos médios são iguais entre todas as criptomoedas
+H1 (Hipótese Alternativa): Pelo menos uma criptomoeda tem retorno médio diferente
+Resultado: REJEITAR H0 - Há diferenças significativas entre as criptomoedas
+
+ANÁLISE POST HOC (Teste t pareado):
+----------------------------------------
+Para identificar quais criptomoedas diferem entre si:
+
+BCH/USDT - Buy and Hold vs BTC/USDT - Buy and Hold:
+  Diferença de Média: -0.0552
+  Estatística t: -2.2527
+  Valor p: 0.1531
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs DASH/USDT - Buy and Hold:
+  Diferença de Média: -0.0023
+  Estatística t: -0.1281
+  Valor p: 0.9098
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs DASH/USDT - LinearRegression:
+  Diferença de Média: -0.0023
+  Estatística t: -0.1281
+  Valor p: 0.9098
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs DASH/USDT - MLPRegressor:
+  Diferença de Média: -0.0023
+  Estatística t: -0.1281
+  Valor p: 0.9098
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs DASH/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0023
+  Estatística t: -0.1281
+  Valor p: 0.9098
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs EOS/USDT - Buy and Hold:
+  Diferença de Média: -0.0164
+  Estatística t: -0.6018
+  Valor p: 0.6084
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs ETC/USDT - Buy and Hold:
+  Diferença de Média: 0.0038
+  Estatística t: 0.2253
+  Valor p: 0.8427
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs ETH/USDT - Buy and Hold:
+  Diferença de Média: 0.0152
+  Estatística t: 0.9154
+  Valor p: 0.4566
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs LTC/USDT - Buy and Hold:
+  Diferença de Média: -0.0014
+  Estatística t: -0.0828
+  Valor p: 0.9415
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0014
+  Estatística t: -0.0828
+  Valor p: 0.9415
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0295
+  Estatística t: -1.6974
+  Valor p: 0.2317
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0295
+  Estatística t: -1.6974
+  Valor p: 0.2317
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0295
+  Estatística t: -1.6974
+  Valor p: 0.2317
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0295
+  Estatística t: -1.6974
+  Valor p: 0.2317
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0295
+  Estatística t: -1.6974
+  Valor p: 0.2317
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0065
+  Estatística t: -0.3867
+  Valor p: 0.7363
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0067
+  Estatística t: 0.3802
+  Valor p: 0.7404
+  Significativo: Não
+
+BCH/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0067
+  Estatística t: 0.3802
+  Valor p: 0.7404
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs DASH/USDT - Buy and Hold:
+  Diferença de Média: 0.0529
+  Estatística t: 2.6786
+  Valor p: 0.1157
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs DASH/USDT - LinearRegression:
+  Diferença de Média: 0.0529
+  Estatística t: 2.6786
+  Valor p: 0.1157
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs DASH/USDT - MLPRegressor:
+  Diferença de Média: 0.0529
+  Estatística t: 2.6786
+  Valor p: 0.1157
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs DASH/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0529
+  Estatística t: 2.6786
+  Valor p: 0.1157
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs EOS/USDT - Buy and Hold:
+  Diferença de Média: 0.0388
+  Estatística t: 1.3767
+  Valor p: 0.3025
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs ETC/USDT - Buy and Hold:
+  Diferença de Média: 0.0590
+  Estatística t: 3.2437
+  Valor p: 0.0833
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs ETH/USDT - Buy and Hold:
+  Diferença de Média: 0.0704
+  Estatística t: 3.8894
+  Valor p: 0.0602
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs LTC/USDT - Buy and Hold:
+  Diferença de Média: 0.0538
+  Estatística t: 2.9225
+  Valor p: 0.0999
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0538
+  Estatística t: 2.9225
+  Valor p: 0.0999
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs XMR/USDT - Buy and Hold:
+  Diferença de Média: 0.0257
+  Estatística t: 1.3606
+  Valor p: 0.3067
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs XMR/USDT - LinearRegression:
+  Diferença de Média: 0.0257
+  Estatística t: 1.3606
+  Valor p: 0.3067
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs XMR/USDT - MLPRegressor:
+  Diferença de Média: 0.0257
+  Estatística t: 1.3606
+  Valor p: 0.3067
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: 0.0257
+  Estatística t: 1.3606
+  Valor p: 0.3067
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0257
+  Estatística t: 1.3606
+  Valor p: 0.3067
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs XRP/USDT - Buy and Hold:
+  Diferença de Média: 0.0488
+  Estatística t: 2.6583
+  Valor p: 0.1172
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0619
+  Estatística t: 3.2461
+  Valor p: 0.0832
+  Significativo: Não
+
+BTC/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0619
+  Estatística t: 3.2461
+  Valor p: 0.0832
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs DASH/USDT - LinearRegression:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs DASH/USDT - MLPRegressor:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs DASH/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs EOS/USDT - Buy and Hold:
+  Diferença de Média: -0.0140
+  Estatística t: -0.6096
+  Valor p: 0.6041
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs ETC/USDT - Buy and Hold:
+  Diferença de Média: 0.0061
+  Estatística t: 0.7529
+  Valor p: 0.5301
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs ETH/USDT - Buy and Hold:
+  Diferença de Média: 0.0175
+  Estatística t: 2.2150
+  Valor p: 0.1571
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs LTC/USDT - Buy and Hold:
+  Diferença de Média: 0.0009
+  Estatística t: 0.1102
+  Valor p: 0.9223
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0009
+  Estatística t: 0.1102
+  Valor p: 0.9223
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0042
+  Estatística t: -0.4921
+  Valor p: 0.6713
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0090
+  Estatística t: 0.9095
+  Valor p: 0.4591
+  Significativo: Não
+
+DASH/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0090
+  Estatística t: 0.9095
+  Valor p: 0.4591
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs DASH/USDT - MLPRegressor:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs DASH/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs EOS/USDT - Buy and Hold:
+  Diferença de Média: -0.0140
+  Estatística t: -0.6096
+  Valor p: 0.6041
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs ETC/USDT - Buy and Hold:
+  Diferença de Média: 0.0061
+  Estatística t: 0.7529
+  Valor p: 0.5301
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs ETH/USDT - Buy and Hold:
+  Diferença de Média: 0.0175
+  Estatística t: 2.2150
+  Valor p: 0.1571
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs LTC/USDT - Buy and Hold:
+  Diferença de Média: 0.0009
+  Estatística t: 0.1102
+  Valor p: 0.9223
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0009
+  Estatística t: 0.1102
+  Valor p: 0.9223
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0042
+  Estatística t: -0.4921
+  Valor p: 0.6713
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0090
+  Estatística t: 0.9095
+  Valor p: 0.4591
+  Significativo: Não
+
+DASH/USDT - LinearRegression vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0090
+  Estatística t: 0.9095
+  Valor p: 0.4591
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs DASH/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs EOS/USDT - Buy and Hold:
+  Diferença de Média: -0.0140
+  Estatística t: -0.6096
+  Valor p: 0.6041
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs ETC/USDT - Buy and Hold:
+  Diferença de Média: 0.0061
+  Estatística t: 0.7529
+  Valor p: 0.5301
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs ETH/USDT - Buy and Hold:
+  Diferença de Média: 0.0175
+  Estatística t: 2.2150
+  Valor p: 0.1571
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs LTC/USDT - Buy and Hold:
+  Diferença de Média: 0.0009
+  Estatística t: 0.1102
+  Valor p: 0.9223
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0009
+  Estatística t: 0.1102
+  Valor p: 0.9223
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0042
+  Estatística t: -0.4921
+  Valor p: 0.6713
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0090
+  Estatística t: 0.9095
+  Valor p: 0.4591
+  Significativo: Não
+
+DASH/USDT - MLPRegressor vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0090
+  Estatística t: 0.9095
+  Valor p: 0.4591
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs EOS/USDT - Buy and Hold:
+  Diferença de Média: -0.0140
+  Estatística t: -0.6096
+  Valor p: 0.6041
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs ETC/USDT - Buy and Hold:
+  Diferença de Média: 0.0061
+  Estatística t: 0.7529
+  Valor p: 0.5301
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs ETH/USDT - Buy and Hold:
+  Diferença de Média: 0.0175
+  Estatística t: 2.2150
+  Valor p: 0.1571
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs LTC/USDT - Buy and Hold:
+  Diferença de Média: 0.0009
+  Estatística t: 0.1102
+  Valor p: 0.9223
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0009
+  Estatística t: 0.1102
+  Valor p: 0.9223
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0272
+  Estatística t: -2.8424
+  Valor p: 0.1047
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0042
+  Estatística t: -0.4921
+  Valor p: 0.6713
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0090
+  Estatística t: 0.9095
+  Valor p: 0.4591
+  Significativo: Não
+
+DASH/USDT - PolynomialRegression_degree_3 vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0090
+  Estatística t: 0.9095
+  Valor p: 0.4591
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs ETC/USDT - Buy and Hold:
+  Diferença de Média: 0.0202
+  Estatística t: 0.9275
+  Valor p: 0.4516
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs ETH/USDT - Buy and Hold:
+  Diferença de Média: 0.0315
+  Estatística t: 1.4573
+  Valor p: 0.2824
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs LTC/USDT - Buy and Hold:
+  Diferença de Média: 0.0150
+  Estatística t: 0.6842
+  Valor p: 0.5645
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0150
+  Estatística t: 0.6842
+  Valor p: 0.5645
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0132
+  Estatística t: -0.5893
+  Valor p: 0.6153
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0132
+  Estatística t: -0.5893
+  Valor p: 0.6153
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0132
+  Estatística t: -0.5893
+  Valor p: 0.6153
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0132
+  Estatística t: -0.5893
+  Valor p: 0.6153
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0132
+  Estatística t: -0.5893
+  Valor p: 0.6153
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs XRP/USDT - Buy and Hold:
+  Diferença de Média: 0.0099
+  Estatística t: 0.4531
+  Valor p: 0.6949
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0231
+  Estatística t: 1.0276
+  Valor p: 0.4122
+  Significativo: Não
+
+EOS/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0231
+  Estatística t: 1.0276
+  Valor p: 0.4122
+  Significativo: Não
+
+ETC/USDT - Buy and Hold vs ETH/USDT - Buy and Hold:
+  Diferença de Média: 0.0114
+  Estatística t: 6.3236
+  Valor p: 0.0241
+  Significativo: Sim
+
+ETC/USDT - Buy and Hold vs LTC/USDT - Buy and Hold:
+  Diferença de Média: -0.0052
+  Estatística t: -1.3235
+  Valor p: 0.3167
+  Significativo: Não
+
+ETC/USDT - Buy and Hold vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0052
+  Estatística t: -1.3235
+  Valor p: 0.3167
+  Significativo: Não
+
+ETC/USDT - Buy and Hold vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0333
+  Estatística t: -5.8502
+  Valor p: 0.0280
+  Significativo: Sim
+
+ETC/USDT - Buy and Hold vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0333
+  Estatística t: -5.8502
+  Valor p: 0.0280
+  Significativo: Sim
+
+ETC/USDT - Buy and Hold vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0333
+  Estatística t: -5.8502
+  Valor p: 0.0280
+  Significativo: Sim
+
+ETC/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0333
+  Estatística t: -5.8502
+  Valor p: 0.0280
+  Significativo: Sim
+
+ETC/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0333
+  Estatística t: -5.8502
+  Valor p: 0.0280
+  Significativo: Sim
+
+ETC/USDT - Buy and Hold vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0103
+  Estatística t: -2.9660
+  Valor p: 0.0974
+  Significativo: Não
+
+ETC/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0029
+  Estatística t: 0.4674
+  Valor p: 0.6862
+  Significativo: Não
+
+ETC/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0029
+  Estatística t: 0.4674
+  Valor p: 0.6862
+  Significativo: Não
+
+ETH/USDT - Buy and Hold vs LTC/USDT - Buy and Hold:
+  Diferença de Média: -0.0166
+  Estatística t: -4.7951
+  Valor p: 0.0408
+  Significativo: Sim
+
+ETH/USDT - Buy and Hold vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0166
+  Estatística t: -4.7951
+  Valor p: 0.0408
+  Significativo: Sim
+
+ETH/USDT - Buy and Hold vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0447
+  Estatística t: -8.2764
+  Valor p: 0.0143
+  Significativo: Sim
+
+ETH/USDT - Buy and Hold vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0447
+  Estatística t: -8.2764
+  Valor p: 0.0143
+  Significativo: Sim
+
+ETH/USDT - Buy and Hold vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0447
+  Estatística t: -8.2764
+  Valor p: 0.0143
+  Significativo: Sim
+
+ETH/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0447
+  Estatística t: -8.2764
+  Valor p: 0.0143
+  Significativo: Sim
+
+ETH/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0447
+  Estatística t: -8.2764
+  Valor p: 0.0143
+  Significativo: Sim
+
+ETH/USDT - Buy and Hold vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0216
+  Estatística t: -7.3348
+  Valor p: 0.0181
+  Significativo: Sim
+
+ETH/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: -0.0084
+  Estatística t: -1.3965
+  Valor p: 0.2974
+  Significativo: Não
+
+ETH/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: -0.0084
+  Estatística t: -1.3965
+  Valor p: 0.2974
+  Significativo: Não
+
+LTC/USDT - Buy and Hold vs LTC/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+LTC/USDT - Buy and Hold vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - Buy and Hold vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - Buy and Hold vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - Buy and Hold vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0051
+  Estatística t: -1.1235
+  Valor p: 0.3780
+  Significativo: Não
+
+LTC/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0081
+  Estatística t: 1.1630
+  Valor p: 0.3648
+  Significativo: Não
+
+LTC/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0081
+  Estatística t: 1.1630
+  Valor p: 0.3648
+  Significativo: Não
+
+LTC/USDT - PolynomialRegression_degree_3 vs XMR/USDT - Buy and Hold:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - PolynomialRegression_degree_3 vs XMR/USDT - LinearRegression:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - PolynomialRegression_degree_3 vs XMR/USDT - MLPRegressor:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - PolynomialRegression_degree_3 vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - PolynomialRegression_degree_3 vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: -0.0281
+  Estatística t: -4.3929
+  Valor p: 0.0481
+  Significativo: Sim
+
+LTC/USDT - PolynomialRegression_degree_3 vs XRP/USDT - Buy and Hold:
+  Diferença de Média: -0.0051
+  Estatística t: -1.1235
+  Valor p: 0.3780
+  Significativo: Não
+
+LTC/USDT - PolynomialRegression_degree_3 vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0081
+  Estatística t: 1.1630
+  Valor p: 0.3648
+  Significativo: Não
+
+LTC/USDT - PolynomialRegression_degree_3 vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0081
+  Estatística t: 1.1630
+  Valor p: 0.3648
+  Significativo: Não
+
+XMR/USDT - Buy and Hold vs XMR/USDT - LinearRegression:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - Buy and Hold vs XMR/USDT - MLPRegressor:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - Buy and Hold vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - Buy and Hold vs XRP/USDT - Buy and Hold:
+  Diferença de Média: 0.0231
+  Estatística t: 3.7460
+  Valor p: 0.0645
+  Significativo: Não
+
+XMR/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - LinearRegression vs XMR/USDT - MLPRegressor:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - LinearRegression vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - LinearRegression vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - LinearRegression vs XRP/USDT - Buy and Hold:
+  Diferença de Média: 0.0231
+  Estatística t: 3.7460
+  Valor p: 0.0645
+  Significativo: Não
+
+XMR/USDT - LinearRegression vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - LinearRegression vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - MLPRegressor vs XMR/USDT - PolynomialRegression_degree_2:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - MLPRegressor vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - MLPRegressor vs XRP/USDT - Buy and Hold:
+  Diferença de Média: 0.0231
+  Estatística t: 3.7460
+  Valor p: 0.0645
+  Significativo: Não
+
+XMR/USDT - MLPRegressor vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - MLPRegressor vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - PolynomialRegression_degree_2 vs XMR/USDT - PolynomialRegression_degree_3:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+XMR/USDT - PolynomialRegression_degree_2 vs XRP/USDT - Buy and Hold:
+  Diferença de Média: 0.0231
+  Estatística t: 3.7460
+  Valor p: 0.0645
+  Significativo: Não
+
+XMR/USDT - PolynomialRegression_degree_2 vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - PolynomialRegression_degree_2 vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - PolynomialRegression_degree_3 vs XRP/USDT - Buy and Hold:
+  Diferença de Média: 0.0231
+  Estatística t: 3.7460
+  Valor p: 0.0645
+  Significativo: Não
+
+XMR/USDT - PolynomialRegression_degree_3 vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XMR/USDT - PolynomialRegression_degree_3 vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0362
+  Estatística t: 4.4701
+  Valor p: 0.0466
+  Significativo: Sim
+
+XRP/USDT - Buy and Hold vs ZRX/USDT - Buy and Hold:
+  Diferença de Média: 0.0132
+  Estatística t: 1.9611
+  Valor p: 0.1889
+  Significativo: Não
+
+XRP/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0132
+  Estatística t: 1.9611
+  Valor p: 0.1889
+  Significativo: Não
+
+ZRX/USDT - Buy and Hold vs ZRX/USDT - MLPRegressor:
+  Diferença de Média: 0.0000
+  Estatística t: 0.0000
+  Valor p: 1.0000
+  Significativo: Não
+
+================================================================================
+Análise concluída com sucesso
+================================================================================

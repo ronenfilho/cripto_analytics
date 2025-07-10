@@ -1,0 +1,51 @@
+2025-07-10 03:55:31,423 - INFO - #################################################################
+2025-07-10 03:55:31,424 - INFO - Diferença entre Buy and Hold e Modelos (MLP, etc.):
+2025-07-10 03:55:31,424 - INFO - #################################################################
+2025-07-10 03:55:31,424 - INFO - Buy and Hold:
+2025-07-10 03:55:31,424 - INFO -  - Compra no início e mantém até o final.
+2025-07-10 03:55:31,424 - INFO -  - Evolução proporcional ao preço inicial e final.
+2025-07-10 03:55:31,424 - INFO - Modelos (MLP, etc.):
+2025-07-10 03:55:31,424 - INFO -  - Usa previsões para ajustar posições diariamente.
+2025-07-10 03:55:31,424 - INFO -  - Evolução depende da precisão das previsões.
+2025-07-10 03:55:31,424 - INFO - #################################################################
+2025-07-10 03:55:31,424 - INFO - Computar o lucro obtido com seu modelo:
+2025-07-10 03:55:31,424 - INFO - #################################################################
+2025-07-10 03:55:31,424 - INFO - Caso tenha investido U$ 1,000.00 no primeiro dia de operação:
+2025-07-10 03:55:31,431 - INFO -  - Refazendo investimentos de todo o saldo acumulado diariamente.
+2025-07-10 03:55:31,432 - INFO -  - Apenas se a previsão do valor de fechamento do próximo dia for superior ao do dia atual.
+2025-07-10 03:55:31,435 - INFO - #################################################################
+2025-07-10 03:55:31,435 - INFO - PARTE 3: Análise dos Modelos:
+2025-07-10 03:55:31,436 - INFO - #################################################################
+2025-07-10 03:57:48,782 - INFO - Coeficientes de Correlação:
+2025-07-10 03:57:48,782 - INFO -  - LinearRegression: 0.9998
+2025-07-10 03:57:48,782 - INFO -  - MLPRegressor: 0.9998
+2025-07-10 03:57:48,782 - INFO -  - PolynomialRegression_degree_2: 0.9998
+2025-07-10 03:57:48,782 - INFO -  - PolynomialRegression_degree_3: 0.9998
+2025-07-10 03:57:48,782 - INFO -  - PolynomialRegression_degree_4: 0.9602
+2025-07-10 03:57:48,782 - INFO -  - PolynomialRegression_degree_5: 0.9273
+2025-07-10 03:57:48,782 - INFO -  - PolynomialRegression_degree_6: 0.8915
+2025-07-10 03:57:48,782 - INFO -  - PolynomialRegression_degree_7: 0.8532
+2025-07-10 03:57:48,786 - INFO -  - PolynomialRegression_degree_8: 0.8150
+2025-07-10 03:57:48,786 - INFO -  - PolynomialRegression_degree_9: 0.7757
+2025-07-10 03:57:48,786 - INFO -  - PolynomialRegression_degree_10: 0.7429
+2025-07-10 03:58:57,510 - INFO - Melhor Modelo: PolynomialRegression_degree_3 com score 0.9996
+2025-07-10 04:00:05,850 - INFO - Erro Padrão:
+2025-07-10 04:00:05,850 - INFO -  - LinearRegression: 261.2398
+2025-07-10 04:00:05,850 - INFO -  - MLPRegressor: 245.7407
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_2: 254.1210
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_3: 223.6880
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_4: 3277.7701
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_5: 4392.2613
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_6: 5317.3562
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_7: 6121.2445
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_8: 6800.0326
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_9: 7406.6262
+2025-07-10 04:00:05,850 - INFO -  - PolynomialRegression_degree_10: 7856.0181
+2025-07-10 04:01:04,456 - INFO - Erro Padrão entre MLP e PolynomialRegression_degree_3: 153.7532
+
+2025-07-10 04:01:04,513 - INFO - Análise Estatística - Teste de Hipótese
+2025-07-10 04:01:04,513 - INFO - Retorno Esperado: 1.00%
+2025-07-10 04:01:04,513 - INFO - Nível de Significância: 0.05
+2025-07-10 04:01:04,513 - INFO - Total de registros: 3480
+2025-07-10 04:01:04,513 - INFO - Registros com investimento realizado: 1968
+2025-07-10 04:01:04,515 - INFO - ======================================================================

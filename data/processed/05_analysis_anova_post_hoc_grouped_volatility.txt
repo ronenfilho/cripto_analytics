@@ -1,0 +1,18 @@
+================================================================================
+ANÁLISE POST HOC - GRUPOS DE CRIPTOMOEDAS
+================================================================================
+
+Critério de Agrupamento: volatility
+Método do Teste: Teste t pareado
+Objetivo: Identificar quais grupos diferem significativamente entre si
+
+RESULTADO:
+----------------------------------------
+ANOVA não foi significativa - Teste post hoc não aplicável
+Razão: p-valor da ANOVA (0.3404) > 0.05
+Conclusão: Não há diferenças significativas entre os grupos para justificar comparações pareadas
+
+
+================================================================================
+Análise concluída com sucesso
+================================================================================

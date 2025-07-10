@@ -49,14 +49,8 @@ def hypothesis_test_by_strategy(data: pd.DataFrame, expected_return: float, sign
     for (symbol, strategy), group in data.groupby(["symbol", "strategy"]):
         returns = group["return_pct"].dropna()
 
-        # Realiza o teste t de uma amostra (teste unilateral à esquerda)
-        # H0: μ ≥ expected_return (retorno médio é maior ou igual ao esperado)
-        # H1: μ < expected_return (retorno médio é menor que o esperado)
         t_stat, p_value_bilateral = ttest_1samp(returns, expected_return / 100)
         
-        # Para teste unilateral à esquerda (μ < x), usamos:
-        # Se t_stat < 0: p_value = p_value_bilateral / 2
-        # Se t_stat ≥ 0: p_value = 1 - (p_value_bilateral / 2)
         if t_stat < 0:
             p_value = p_value_bilateral / 2
         else:
@@ -105,28 +99,27 @@ def save_hypothesis_test_results(results: List[Dict[str, any]], filename: str = 
 
     logging.info(f"Resultados do teste de hipótese salvos em: {filepath}")
 
-def anova_analysis_cryptocurrencies(data: pd.DataFrame, significance_level: float = 0.05) -> Dict[str, any]:
+def anova_analysis_cryptocurrencies(data_filtered: pd.DataFrame, significance_level: float = 0.05) -> Dict[str, any]:
     """
-    Realiza análise ANOVA para comparar retornos médios diários entre criptomoedas.
+    Realiza análise ANOVA para comparar retornos médios diários entre criptomoedas por estratégia.
     
     Args:
-        data (pd.DataFrame): DataFrame contendo colunas ['symbol', 'return_pct'].
+        data_filtered (pd.DataFrame): DataFrame contendo colunas ['symbol', 'strategy', 'return_pct'].
         significance_level (float): Nível de significância para o teste (default: 0.05).
     
     Returns:
         Dict[str, any]: Resultados da análise ANOVA e teste post hoc.
     """
-    # Filtra apenas dados com investimento realizado
-    data_filtered = data[data['investment_made'] == 'Yes'].copy()
     
-    # Agrupa retornos por criptomoeda
+    # Agrupa retornos por combinação de criptomoeda e estratégia
     groups = []
-    symbols = []
-    for symbol, group in data_filtered.groupby('symbol'):
+    group_labels = []
+    
+    for (symbol, strategy), group in data_filtered.groupby(['symbol', 'strategy']):
         returns = group['return_pct'].dropna()
         if len(returns) > 1:  # Precisa de pelo menos 2 observações
             groups.append(returns.values)
-            symbols.append(symbol)
+            group_labels.append(f"{symbol} - {strategy}")
     
     if len(groups) < 2:
         return {"error": "Necessário pelo menos 2 grupos com dados suficientes para ANOVA"}
@@ -136,14 +129,14 @@ def anova_analysis_cryptocurrencies(data: pd.DataFrame, significance_level: floa
     
     # Interpretação do resultado
     is_significant = p_value < significance_level
-    anova_conclusion = "Há diferença significativa entre as criptomoedas" if is_significant else "Não há diferença significativa entre as criptomoedas"
+    anova_conclusion = "Há diferença significativa entre as combinações de criptomoedas e estratégias" if is_significant else "Não há diferença significativa entre as combinações de criptomoedas e estratégias"
     
     results = {
         "anova_f_statistic": f_stat,
         "anova_p_value": p_value,
         "is_significant": is_significant,
         "anova_conclusion": anova_conclusion,
-        "symbols_analyzed": symbols,
+        "symbols_analyzed": group_labels,
         "post_hoc": None
     }
     
@@ -152,10 +145,11 @@ def anova_analysis_cryptocurrencies(data: pd.DataFrame, significance_level: floa
         # Prepara dados para teste post hoc
         groups_data = {}
         
-        for symbol, group in data_filtered.groupby('symbol'):
+        for (symbol, strategy), group in data_filtered.groupby(['symbol', 'strategy']):
             returns = group['return_pct'].dropna()
             if len(returns) > 1:
-                groups_data[symbol] = returns.values
+                label = f"{symbol} - {strategy}"
+                groups_data[label] = returns.values
         
         # Realiza teste post hoc simples
         post_hoc_results = simple_pairwise_ttest(groups_data, significance_level)
@@ -167,76 +161,84 @@ def anova_analysis_cryptocurrencies(data: pd.DataFrame, significance_level: floa
     
     return results
 
-def anova_analysis_grouped_cryptocurrencies(data: pd.DataFrame, grouping_criterion: str = "volatility", 
+def anova_analysis_grouped_cryptocurrencies(data_filtered: pd.DataFrame, grouping_criterion: str = "volatility", 
                                           significance_level: float = 0.05) -> Dict[str, any]:
     """
-    Realiza análise ANOVA para comparar retornos médios diários entre grupos de criptomoedas.
+    Realiza análise ANOVA para comparar retornos médios diários entre grupos de criptomoedas por estratégia.
     
     Args:
-        data (pd.DataFrame): DataFrame contendo dados das criptomoedas.
-        grouping_criterion (str): Critério de agrupamento ('volatility', 'volume', 'mean_return').
+        data_filtered (pd.DataFrame): DataFrame contendo dados das criptomoedas com colunas ['symbol', 'strategy', 'return_pct', 'investment_made'].
+        grouping_criterion (str): Critério de agrupamento ('volatility', 'mean_return', 'investment_frequency').
         significance_level (float): Nível de significância para o teste (default: 0.05).
     
     Returns:
         Dict[str, any]: Resultados da análise ANOVA e teste post hoc para grupos.
     """
-    # Filtra apenas dados com investimento realizado
-    data_filtered = data[data['investment_made'] == 'Yes'].copy()
     
-    # Calcula métricas por criptomoeda para agrupamento
-    crypto_metrics = {}
-    for symbol, group in data_filtered.groupby('symbol'):
+    # Calcula métricas por combinação de criptomoeda e estratégia para agrupamento
+    crypto_strategy_metrics = {}
+    for (symbol, strategy), group in data_filtered.groupby(['symbol', 'strategy']):
         returns = group['return_pct'].dropna()
         if len(returns) > 1:
-            crypto_metrics[symbol] = {
+            combo_label = f"{symbol} - {strategy}"
+            crypto_strategy_metrics[combo_label] = {
+                "symbol": symbol,
+                "strategy": strategy,
                 "mean_return": returns.mean(),
-                "volatility": returns.std(),
-                "volume": len(returns)  # Proxy para volume (número de observações)
+                "volatility": returns.std(),  # Calcula a volatilidade como desvio padrão dos retornos
+                "investment_frequency": len(returns)  # Frequência de investimentos
             }
     
-    if len(crypto_metrics) < 2:
-        return {"error": "Necessário pelo menos 2 criptomoedas com dados suficientes"}
+    if len(crypto_strategy_metrics) < 2:
+        return {"error": "Necessário pelo menos 2 combinações criptomoeda-estratégia com dados suficientes"}
     
     # Define grupos baseado no critério escolhido
     if grouping_criterion == "volatility":
-        values = [metrics["volatility"] for metrics in crypto_metrics.values()]
+        values = [metrics["volatility"] for metrics in crypto_strategy_metrics.values()]
         median_value = np.median(values)
         groups_dict = {}
-        for symbol, metrics in crypto_metrics.items():
-            group_name = "High Volatility" if metrics["volatility"] > median_value else "Low Volatility"
+        for combo_label, metrics in crypto_strategy_metrics.items():
+            group_name = "Alta Volatilidade" if metrics["volatility"] > median_value else "Baixa Volatilidade"
             if group_name not in groups_dict:
                 groups_dict[group_name] = []
-            groups_dict[group_name].append(symbol)
+            groups_dict[group_name].append(combo_label)
     
     elif grouping_criterion == "mean_return":
-        values = [metrics["mean_return"] for metrics in crypto_metrics.values()]
+        values = [metrics["mean_return"] for metrics in crypto_strategy_metrics.values()]
         median_value = np.median(values)
         groups_dict = {}
-        for symbol, metrics in crypto_metrics.items():
-            group_name = "High Return" if metrics["mean_return"] > median_value else "Low Return"
+        for combo_label, metrics in crypto_strategy_metrics.items():
+            group_name = "Alto Retorno" if metrics["mean_return"] > median_value else "Baixo Retorno"
             if group_name not in groups_dict:
                 groups_dict[group_name] = []
-            groups_dict[group_name].append(symbol)
+            groups_dict[group_name].append(combo_label)
     
-    else:  # volume
-        values = [metrics["volume"] for metrics in crypto_metrics.values()]
+    else:  # investment_frequency
+        values = [metrics["investment_frequency"] for metrics in crypto_strategy_metrics.values()]
         median_value = np.median(values)
         groups_dict = {}
-        for symbol, metrics in crypto_metrics.items():
-            group_name = "High Volume" if metrics["volume"] > median_value else "Low Volume"
+        for combo_label, metrics in crypto_strategy_metrics.items():
+            group_name = "Alta Frequência de Investimento" if metrics["investment_frequency"] > median_value else "Baixa Frequência de Investimento"
             if group_name not in groups_dict:
                 groups_dict[group_name] = []
-            groups_dict[group_name].append(symbol)
+            groups_dict[group_name].append(combo_label)
     
-    # Coleta retornos por grupo
+    # Coleta retornos por grupo (agora considerando combinações criptomoeda-estratégia)
     group_returns = []
     group_names = []
     
-    for group_name, symbols in groups_dict.items():
-        group_data = data_filtered[data_filtered['symbol'].isin(symbols)]
-        returns = group_data['return_pct'].dropna()
-        if len(returns) > 1:
-            group_returns.append(returns.values)
+    for group_name, combo_labels in groups_dict.items():
+        # Coleta retornos de todas as combinações no grupo
+        all_returns = []
+        for combo_label in combo_labels:
+            symbol, strategy = combo_label.split(' - ')
+            combo_data = data_filtered[(data_filtered['symbol'] == symbol) & 
+                                     (data_filtered['strategy'] == strategy)]
+            returns = combo_data['return_pct'].dropna()
+            all_returns.extend(returns.tolist())
+        
+        if len(all_returns) > 1:
+            group_returns.append(np.array(all_returns))
             group_names.append(group_name)
     
     if len(group_returns) < 2:
@@ -264,11 +266,17 @@ def anova_analysis_grouped_cryptocurrencies(data: pd.DataFrame, grouping_criteri
         # Prepara dados para teste post hoc
         groups_data = {}
         
-        for group_name, symbols in groups_dict.items():
-            group_data = data_filtered[data_filtered['symbol'].isin(symbols)]
-            returns = group_data['return_pct'].dropna()
-            if len(returns) > 1:
-                groups_data[group_name] = returns.values
+        for group_name, combo_labels in groups_dict.items():
+            all_returns = []
+            for combo_label in combo_labels:
+                symbol, strategy = combo_label.split(' - ')
+                combo_data = data_filtered[(data_filtered['symbol'] == symbol) & 
+                                         (data_filtered['strategy'] == strategy)]
+                returns = combo_data['return_pct'].dropna()
+                all_returns.extend(returns.tolist())
+            
+            if len(all_returns) > 1:
+                groups_data[group_name] = np.array(all_returns)
         
         # Realiza teste post hoc simples
         post_hoc_results = simple_pairwise_ttest(groups_data, significance_level)
@@ -280,7 +288,6 @@ def anova_analysis_grouped_cryptocurrencies(data: pd.DataFrame, grouping_criteri
     
     return results
 
-# Alternativa simples para teste post hoc sem statsmodels
 def simple_pairwise_ttest(groups_data: Dict[str, np.ndarray], significance_level: float = 0.05) -> List[Dict[str, any]]:
     """Realiza teste t pareado simples entre grupos."""
     results = []
@@ -463,10 +470,6 @@ def save_anova_post_hoc_grouped(anova_results: Dict[str, any], filename: str = "
     Returns:
         None
     """
-    if not anova_results['is_significant'] or not anova_results['post_hoc']:
-        logging.info("Sem resultados significativos para teste post hoc - grupos de criptomoedas")
-        return
-    
     filepath = PROCESSED_DATA / filename
     
     with open(filepath, mode="w", encoding="utf-8") as file:
@@ -478,52 +481,59 @@ def save_anova_post_hoc_grouped(anova_results: Dict[str, any], filename: str = "
         file.write(f"Método do Teste: Teste t pareado\n")
         file.write(f"Objetivo: Identificar quais grupos diferem significativamente entre si\n\n")
         
-        file.write("GRUPOS FORMADOS:\n")
-        file.write("-" * 40 + "\n")
-        for group_name, symbols in anova_results['groups'].items():
-            file.write(f"{group_name}: {', '.join(symbols)}\n")
-        file.write("\n")
-        
-        file.write("COMPARAÇÕES PAREADAS:\n")
-        file.write("-" * 40 + "\n")
-        
-        for i, comparison in enumerate(anova_results['post_hoc']['pairwise_comparisons'], 1):
-            file.write(f"COMPARAÇÃO {i}: {comparison['group1']} vs {comparison['group2']}\n")
-            file.write("-" * 60 + "\n")
-            file.write(f"Diferença de Média: {comparison['mean_diff']:.4f}\n")
-            file.write(f"Estatística t: {comparison['t_statistic']:.4f}\n")
-            file.write(f"Valor p: {comparison['p_value']:.4f}\n")
-            file.write(f"Resultado: {'SIGNIFICATIVO' if comparison['significant'] else 'NÃO SIGNIFICATIVO'}\n")
-            
-            if comparison['significant']:
-                if comparison['mean_diff'] > 0:
-                    file.write(f"Interpretação: {comparison['group1']} tem retorno médio MAIOR que {comparison['group2']}\n")
-                else:
-                    file.write(f"Interpretação: {comparison['group1']} tem retorno médio MENOR que {comparison['group2']}\n")
-            else:
-                file.write(f"Interpretação: Não há diferença significativa entre {comparison['group1']} e {comparison['group2']}\n")
-            
-            file.write("\n")
-        
-        file.write("=" * 80 + "\n")
-        file.write("RESUMO DA ANÁLISE POST HOC:\n")
-        file.write("=" * 80 + "\n")
-        
-        significant_comparisons = [comp for comp in anova_results['post_hoc']['pairwise_comparisons'] if comp['significant']]
-        total_comparisons = len(anova_results['post_hoc']['pairwise_comparisons'])
-        
-        file.write(f"Total de comparações realizadas: {total_comparisons}\n")
-        file.write(f"Comparações significativas: {len(significant_comparisons)}\n")
-        file.write(f"Comparações não significativas: {total_comparisons - len(significant_comparisons)}\n\n")
-        
-        if significant_comparisons:
-            file.write("DIFERENÇAS SIGNIFICATIVAS ENCONTRADAS:\n")
-            file.write("-" * 50 + "\n")
-            for comp in significant_comparisons:
-                direction = ">" if comp['mean_diff'] > 0 else "<"
-                file.write(f"• {comp['group1']} {direction} {comp['group2']} (p = {comp['p_value']:.4f})\n")
+        if not anova_results['is_significant'] or not anova_results['post_hoc']:
+            file.write("RESULTADO:\n")
+            file.write("-" * 40 + "\n")
+            file.write("ANOVA não foi significativa - Teste post hoc não aplicável\n")
+            file.write(f"Razão: p-valor da ANOVA ({anova_results['anova_p_value']:.4f}) > 0.05\n")
+            file.write("Conclusão: Não há diferenças significativas entre os grupos para justificar comparações pareadas\n\n")
         else:
-            file.write("Nenhuma diferença significativa foi encontrada entre os grupos.\n")
+            file.write("GRUPOS FORMADOS:\n")
+            file.write("-" * 40 + "\n")
+            for group_name, symbols in anova_results['groups'].items():
+                file.write(f"{group_name}: {', '.join(symbols)}\n")
+            file.write("\n")
+            
+            file.write("COMPARAÇÕES PAREADAS:\n")
+            file.write("-" * 40 + "\n")
+            
+            for i, comparison in enumerate(anova_results['post_hoc']['pairwise_comparisons'], 1):
+                file.write(f"COMPARAÇÃO {i}: {comparison['group1']} vs {comparison['group2']}\n")
+                file.write("-" * 60 + "\n")
+                file.write(f"Diferença de Média: {comparison['mean_diff']:.4f}\n")
+                file.write(f"Estatística t: {comparison['t_statistic']:.4f}\n")
+                file.write(f"Valor p: {comparison['p_value']:.4f}\n")
+                file.write(f"Resultado: {'SIGNIFICATIVO' if comparison['significant'] else 'NÃO SIGNIFICATIVO'}\n")
+                
+                if comparison['significant']:
+                    if comparison['mean_diff'] > 0:
+                        file.write(f"Interpretação: {comparison['group1']} tem retorno médio MAIOR que {comparison['group2']}\n")
+                    else:
+                        file.write(f"Interpretação: {comparison['group1']} tem retorno médio MENOR que {comparison['group2']}\n")
+                else:
+                    file.write(f"Interpretação: Não há diferença significativa entre {comparison['group1']} e {comparison['group2']}\n")
+                
+                file.write("\n")
+            
+            file.write("=" * 80 + "\n")
+            file.write("RESUMO DA ANÁLISE POST HOC:\n")
+            file.write("=" * 80 + "\n")
+            
+            significant_comparisons = [comp for comp in anova_results['post_hoc']['pairwise_comparisons'] if comp['significant']]
+            total_comparisons = len(anova_results['post_hoc']['pairwise_comparisons'])
+            
+            file.write(f"Total de comparações realizadas: {total_comparisons}\n")
+            file.write(f"Comparações significativas: {len(significant_comparisons)}\n")
+            file.write(f"Comparações não significativas: {total_comparisons - len(significant_comparisons)}\n\n")
+            
+            if significant_comparisons:
+                file.write("DIFERENÇAS SIGNIFICATIVAS ENCONTRADAS:\n")
+                file.write("-" * 50 + "\n")
+                for comp in significant_comparisons:
+                    direction = ">" if comp['mean_diff'] > 0 else "<"
+                    file.write(f"• {comp['group1']} {direction} {comp['group2']} (p = {comp['p_value']:.4f})\n")
+            else:
+                file.write("Nenhuma diferença significativa foi encontrada entre os grupos.\n")
         
         file.write("\n" + "=" * 80 + "\n")
         file.write("Análise concluída com sucesso\n")
@@ -589,7 +599,7 @@ def main() -> None:
         }
         for (symbol, strategy), result in results_by_strategy.items()
     ]
-    save_hypothesis_test_results(results_to_save)
+    save_hypothesis_test_results(results_to_save, "01_analysis_hypothesis_test_results.csv")
 
     # Análise ANOVA - Teste entre criptomoedas
     anova_results_cryptos = anova_analysis_cryptocurrencies(data_filtered, significance_level)
@@ -610,17 +620,36 @@ def main() -> None:
     
     logging.info("=" * 70)
 
-    # Análise ANOVA - Teste entre grupos de criptomoedas
-    anova_results_groups = anova_analysis_grouped_cryptocurrencies(data_filtered, grouping_criterion="volatility", significance_level=significance_level)
+    # Análise ANOVA - Teste entre grupos de criptomoedas por VOLATILIDADE
+    anova_results_groups_volatility = anova_analysis_grouped_cryptocurrencies(data_filtered, grouping_criterion="volatility", significance_level=significance_level)
     
     logging.info("Resultados da Análise ANOVA - Grupos de Criptomoedas (Volatilidade):")
-    logging.info(f"  Estatística F: {anova_results_groups['anova_f_statistic']:.4f}")
-    logging.info(f"  p-valor: {anova_results_groups['anova_p_value']:.4f}")
-    logging.info(f"  Conclusão: {anova_results_groups['anova_conclusion']}")
+    logging.info(f"  Estatística F: {anova_results_groups_volatility['anova_f_statistic']:.4f}")
+    logging.info(f"  p-valor: {anova_results_groups_volatility['anova_p_value']:.4f}")
+    logging.info(f"  Conclusão: {anova_results_groups_volatility['anova_conclusion']}")
     
-    if anova_results_groups["is_significant"]:
+    if anova_results_groups_volatility["is_significant"]:
         logging.info("  Comparações par a par (Pairwise t-test):")
-        for comparison in anova_results_groups["post_hoc"]["pairwise_comparisons"]:
+        for comparison in anova_results_groups_volatility["post_hoc"]["pairwise_comparisons"]:
+            logging.info(f"    {comparison['group1']} vs {comparison['group2']}:")
+            logging.info(f"      Diferença de Média: {comparison['mean_diff']:.4f}")
+            logging.info(f"      p-valor: {comparison['p_value']:.4f}")
+            logging.info(f"      Estatística t: {comparison['t_statistic']:.4f}")
+            logging.info(f"      Significativo: {'Sim' if comparison['significant'] else 'Não'}")
+    
+    logging.info("=" * 70)
+
+    # Análise ANOVA - Teste entre grupos de criptomoedas por RETORNO MÉDIO
+    anova_results_groups_return = anova_analysis_grouped_cryptocurrencies(data_filtered, grouping_criterion="mean_return", significance_level=significance_level)
+    
+    logging.info("Resultados da Análise ANOVA - Grupos de Criptomoedas (Retorno Médio):")
+    logging.info(f"  Estatística F: {anova_results_groups_return['anova_f_statistic']:.4f}")
+    logging.info(f"  p-valor: {anova_results_groups_return['anova_p_value']:.4f}")
+    logging.info(f"  Conclusão: {anova_results_groups_return['anova_conclusion']}")
+    
+    if anova_results_groups_return["is_significant"]:
+        logging.info("  Comparações par a par (Pairwise t-test):")
+        for comparison in anova_results_groups_return["post_hoc"]["pairwise_comparisons"]:
             logging.info(f"    {comparison['group1']} vs {comparison['group2']}:")
             logging.info(f"      Diferença de Média: {comparison['mean_diff']:.4f}")
             logging.info(f"      p-valor: {comparison['p_value']:.4f}")
@@ -629,11 +658,17 @@ def main() -> None:
     
     logging.info("=" * 70)
     
-    # Salva resultados da análise ANOVA em arquivos CSV separados
-    save_anova_individual_cryptocurrencies(anova_results_cryptos)
-    save_anova_post_hoc_individual(anova_results_cryptos)
-    save_anova_grouped_cryptocurrencies(anova_results_groups)
-    save_anova_post_hoc_grouped(anova_results_groups)
+    # Salva resultados da análise ANOVA em arquivos separados
+    save_anova_individual_cryptocurrencies(anova_results_cryptos, "02_analysis_anova_individual_cryptos.txt")
+    save_anova_post_hoc_individual(anova_results_cryptos, "03_analysis_anova_post_hoc_individual.csv")
+    
+    # Salva resultados por VOLATILIDADE
+    save_anova_grouped_cryptocurrencies(anova_results_groups_volatility, "04_analysis_anova_grouped_cryptos_volatility.txt")
+    save_anova_post_hoc_grouped(anova_results_groups_volatility, "05_analysis_anova_post_hoc_grouped_volatility.txt")
+    
+    # Salva resultados por RETORNO MÉDIO
+    save_anova_grouped_cryptocurrencies(anova_results_groups_return, "06_analysis_anova_grouped_cryptos_mean_return.txt")
+    save_anova_post_hoc_grouped(anova_results_groups_return, "07_analysis_anova_post_hoc_grouped_mean_return.txt")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,62 @@
+# ==============================================================================
+# DEPENDÊNCIAS DE DESENVOLVIMENTO - CRIPTO ANALYTICS
+# ==============================================================================
+# 
+# Este arquivo contém dependências específicas para desenvolvimento,
+# testes, formatação e qualidade de código.
+# 
+# Instalação:
+# pip install -r requirements-dev.txt
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 🧪 TESTES E COBERTURA
+# ------------------------------------------------------------------------------
+pytest>=7.4.0                    # Framework de testes
+pytest-cov>=4.1.0               # Cobertura de testes
+pytest-xdist>=3.3.0             # Execução paralela de testes
+pytest-mock>=3.11.0             # Mocking para testes
+
+# ------------------------------------------------------------------------------
+# 🎨 FORMATAÇÃO E LINTING
+# ------------------------------------------------------------------------------
+black>=23.7.0                   # Formatador de código Python
+ruff>=0.0.280                   # Linter e formatador rápido
+#isort>=5.12.0                   # Organizador de imports
+
+# ------------------------------------------------------------------------------
+# 📊 ANÁLISE DE CÓDIGO
+# ------------------------------------------------------------------------------
+#mypy>=1.5.0                     # Verificação de tipos estáticos
+#bandit>=1.7.5                   # Análise de segurança
+#flake8>=6.0.0                   # Linting adicional
+#pylint>=2.17.0                  # Análise de código detalhada
+#
+# ------------------------------------------------------------------------------
+# 📚 DOCUMENTAÇÃO
+# ------------------------------------------------------------------------------
+#sphinx>=7.1.0                   # Geração de documentação
+#sphinx-rtd-theme>=1.3.0         # Tema Read the Docs
+#myst-parser>=2.0.0              # Parser Markdown para Sphinx
+
+# ------------------------------------------------------------------------------
+# 🔧 FERRAMENTAS DE DESENVOLVIMENTO
+# ------------------------------------------------------------------------------
+#pre-commit>=3.3.0               # Hooks de pré-commit
+#pipreqs>=0.4.13                 # Geração automática de requirements
+#bump2version>=1.0.1             # Versionamento semântico
+#jupyter>=1.0.0                  # Jupyter Notebook para prototipagem
+
+# ------------------------------------------------------------------------------
+# 📈 PROFILING E PERFORMANCE
+# ------------------------------------------------------------------------------
+#memory-profiler>=0.61.0         # Profiling de memória
+#line-profiler>=4.1.0            # Profiling de linha por linha
+#py-spy>=0.3.14                  # Profiler de produção
+
+# ------------------------------------------------------------------------------
+# 🐛 DEBUG E DESENVOLVIMENTO
+# ------------------------------------------------------------------------------
+#ipdb>=0.13.13                   # Debugger interativo
+#rich>=13.5.0                    # Output colorido e formatado
+#tqdm>=4.66.0                    # Barras de progresso

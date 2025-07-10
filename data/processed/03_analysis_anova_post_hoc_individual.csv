@@ -1,0 +1,172 @@
+Cryptocurrency_1,Cryptocurrency_2,Mean_Difference,T_Statistic,P_Value,Significant,Test_Method
+BCH/USDT - Buy and Hold,BTC/USDT - Buy and Hold,-0.0552,-2.2527,0.1531,No,Pairwise t-test
+BCH/USDT - Buy and Hold,DASH/USDT - Buy and Hold,-0.0023,-0.1281,0.9098,No,Pairwise t-test
+BCH/USDT - Buy and Hold,DASH/USDT - LinearRegression,-0.0023,-0.1281,0.9098,No,Pairwise t-test
+BCH/USDT - Buy and Hold,DASH/USDT - MLPRegressor,-0.0023,-0.1281,0.9098,No,Pairwise t-test
+BCH/USDT - Buy and Hold,DASH/USDT - PolynomialRegression_degree_3,-0.0023,-0.1281,0.9098,No,Pairwise t-test
+BCH/USDT - Buy and Hold,EOS/USDT - Buy and Hold,-0.0164,-0.6018,0.6084,No,Pairwise t-test
+BCH/USDT - Buy and Hold,ETC/USDT - Buy and Hold,0.0038,0.2253,0.8427,No,Pairwise t-test
+BCH/USDT - Buy and Hold,ETH/USDT - Buy and Hold,0.0152,0.9154,0.4566,No,Pairwise t-test
+BCH/USDT - Buy and Hold,LTC/USDT - Buy and Hold,-0.0014,-0.0828,0.9415,No,Pairwise t-test
+BCH/USDT - Buy and Hold,LTC/USDT - PolynomialRegression_degree_3,-0.0014,-0.0828,0.9415,No,Pairwise t-test
+BCH/USDT - Buy and Hold,XMR/USDT - Buy and Hold,-0.0295,-1.6974,0.2317,No,Pairwise t-test
+BCH/USDT - Buy and Hold,XMR/USDT - LinearRegression,-0.0295,-1.6974,0.2317,No,Pairwise t-test
+BCH/USDT - Buy and Hold,XMR/USDT - MLPRegressor,-0.0295,-1.6974,0.2317,No,Pairwise t-test
+BCH/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_2,-0.0295,-1.6974,0.2317,No,Pairwise t-test
+BCH/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_3,-0.0295,-1.6974,0.2317,No,Pairwise t-test
+BCH/USDT - Buy and Hold,XRP/USDT - Buy and Hold,-0.0065,-0.3867,0.7363,No,Pairwise t-test
+BCH/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,0.0067,0.3802,0.7404,No,Pairwise t-test
+BCH/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0067,0.3802,0.7404,No,Pairwise t-test
+BTC/USDT - Buy and Hold,DASH/USDT - Buy and Hold,0.0529,2.6786,0.1157,No,Pairwise t-test
+BTC/USDT - Buy and Hold,DASH/USDT - LinearRegression,0.0529,2.6786,0.1157,No,Pairwise t-test
+BTC/USDT - Buy and Hold,DASH/USDT - MLPRegressor,0.0529,2.6786,0.1157,No,Pairwise t-test
+BTC/USDT - Buy and Hold,DASH/USDT - PolynomialRegression_degree_3,0.0529,2.6786,0.1157,No,Pairwise t-test
+BTC/USDT - Buy and Hold,EOS/USDT - Buy and Hold,0.0388,1.3767,0.3025,No,Pairwise t-test
+BTC/USDT - Buy and Hold,ETC/USDT - Buy and Hold,0.0590,3.2437,0.0833,No,Pairwise t-test
+BTC/USDT - Buy and Hold,ETH/USDT - Buy and Hold,0.0704,3.8894,0.0602,No,Pairwise t-test
+BTC/USDT - Buy and Hold,LTC/USDT - Buy and Hold,0.0538,2.9225,0.0999,No,Pairwise t-test
+BTC/USDT - Buy and Hold,LTC/USDT - PolynomialRegression_degree_3,0.0538,2.9225,0.0999,No,Pairwise t-test
+BTC/USDT - Buy and Hold,XMR/USDT - Buy and Hold,0.0257,1.3606,0.3067,No,Pairwise t-test
+BTC/USDT - Buy and Hold,XMR/USDT - LinearRegression,0.0257,1.3606,0.3067,No,Pairwise t-test
+BTC/USDT - Buy and Hold,XMR/USDT - MLPRegressor,0.0257,1.3606,0.3067,No,Pairwise t-test
+BTC/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_2,0.0257,1.3606,0.3067,No,Pairwise t-test
+BTC/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_3,0.0257,1.3606,0.3067,No,Pairwise t-test
+BTC/USDT - Buy and Hold,XRP/USDT - Buy and Hold,0.0488,2.6583,0.1172,No,Pairwise t-test
+BTC/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,0.0619,3.2461,0.0832,No,Pairwise t-test
+BTC/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0619,3.2461,0.0832,No,Pairwise t-test
+DASH/USDT - Buy and Hold,DASH/USDT - LinearRegression,0.0000,0.0000,1.0000,No,Pairwise t-test
+DASH/USDT - Buy and Hold,DASH/USDT - MLPRegressor,0.0000,0.0000,1.0000,No,Pairwise t-test
+DASH/USDT - Buy and Hold,DASH/USDT - PolynomialRegression_degree_3,0.0000,0.0000,1.0000,No,Pairwise t-test
+DASH/USDT - Buy and Hold,EOS/USDT - Buy and Hold,-0.0140,-0.6096,0.6041,No,Pairwise t-test
+DASH/USDT - Buy and Hold,ETC/USDT - Buy and Hold,0.0061,0.7529,0.5301,No,Pairwise t-test
+DASH/USDT - Buy and Hold,ETH/USDT - Buy and Hold,0.0175,2.2150,0.1571,No,Pairwise t-test
+DASH/USDT - Buy and Hold,LTC/USDT - Buy and Hold,0.0009,0.1102,0.9223,No,Pairwise t-test
+DASH/USDT - Buy and Hold,LTC/USDT - PolynomialRegression_degree_3,0.0009,0.1102,0.9223,No,Pairwise t-test
+DASH/USDT - Buy and Hold,XMR/USDT - Buy and Hold,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - Buy and Hold,XMR/USDT - LinearRegression,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - Buy and Hold,XMR/USDT - MLPRegressor,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_2,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_3,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - Buy and Hold,XRP/USDT - Buy and Hold,-0.0042,-0.4921,0.6713,No,Pairwise t-test
+DASH/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,0.0090,0.9095,0.4591,No,Pairwise t-test
+DASH/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0090,0.9095,0.4591,No,Pairwise t-test
+DASH/USDT - LinearRegression,DASH/USDT - MLPRegressor,0.0000,0.0000,1.0000,No,Pairwise t-test
+DASH/USDT - LinearRegression,DASH/USDT - PolynomialRegression_degree_3,0.0000,0.0000,1.0000,No,Pairwise t-test
+DASH/USDT - LinearRegression,EOS/USDT - Buy and Hold,-0.0140,-0.6096,0.6041,No,Pairwise t-test
+DASH/USDT - LinearRegression,ETC/USDT - Buy and Hold,0.0061,0.7529,0.5301,No,Pairwise t-test
+DASH/USDT - LinearRegression,ETH/USDT - Buy and Hold,0.0175,2.2150,0.1571,No,Pairwise t-test
+DASH/USDT - LinearRegression,LTC/USDT - Buy and Hold,0.0009,0.1102,0.9223,No,Pairwise t-test
+DASH/USDT - LinearRegression,LTC/USDT - PolynomialRegression_degree_3,0.0009,0.1102,0.9223,No,Pairwise t-test
+DASH/USDT - LinearRegression,XMR/USDT - Buy and Hold,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - LinearRegression,XMR/USDT - LinearRegression,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - LinearRegression,XMR/USDT - MLPRegressor,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - LinearRegression,XMR/USDT - PolynomialRegression_degree_2,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - LinearRegression,XMR/USDT - PolynomialRegression_degree_3,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - LinearRegression,XRP/USDT - Buy and Hold,-0.0042,-0.4921,0.6713,No,Pairwise t-test
+DASH/USDT - LinearRegression,ZRX/USDT - Buy and Hold,0.0090,0.9095,0.4591,No,Pairwise t-test
+DASH/USDT - LinearRegression,ZRX/USDT - MLPRegressor,0.0090,0.9095,0.4591,No,Pairwise t-test
+DASH/USDT - MLPRegressor,DASH/USDT - PolynomialRegression_degree_3,0.0000,0.0000,1.0000,No,Pairwise t-test
+DASH/USDT - MLPRegressor,EOS/USDT - Buy and Hold,-0.0140,-0.6096,0.6041,No,Pairwise t-test
+DASH/USDT - MLPRegressor,ETC/USDT - Buy and Hold,0.0061,0.7529,0.5301,No,Pairwise t-test
+DASH/USDT - MLPRegressor,ETH/USDT - Buy and Hold,0.0175,2.2150,0.1571,No,Pairwise t-test
+DASH/USDT - MLPRegressor,LTC/USDT - Buy and Hold,0.0009,0.1102,0.9223,No,Pairwise t-test
+DASH/USDT - MLPRegressor,LTC/USDT - PolynomialRegression_degree_3,0.0009,0.1102,0.9223,No,Pairwise t-test
+DASH/USDT - MLPRegressor,XMR/USDT - Buy and Hold,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - MLPRegressor,XMR/USDT - LinearRegression,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - MLPRegressor,XMR/USDT - MLPRegressor,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - MLPRegressor,XMR/USDT - PolynomialRegression_degree_2,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - MLPRegressor,XMR/USDT - PolynomialRegression_degree_3,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - MLPRegressor,XRP/USDT - Buy and Hold,-0.0042,-0.4921,0.6713,No,Pairwise t-test
+DASH/USDT - MLPRegressor,ZRX/USDT - Buy and Hold,0.0090,0.9095,0.4591,No,Pairwise t-test
+DASH/USDT - MLPRegressor,ZRX/USDT - MLPRegressor,0.0090,0.9095,0.4591,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,EOS/USDT - Buy and Hold,-0.0140,-0.6096,0.6041,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,ETC/USDT - Buy and Hold,0.0061,0.7529,0.5301,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,ETH/USDT - Buy and Hold,0.0175,2.2150,0.1571,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,LTC/USDT - Buy and Hold,0.0009,0.1102,0.9223,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,LTC/USDT - PolynomialRegression_degree_3,0.0009,0.1102,0.9223,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,XMR/USDT - Buy and Hold,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,XMR/USDT - LinearRegression,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,XMR/USDT - MLPRegressor,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,XMR/USDT - PolynomialRegression_degree_2,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,XMR/USDT - PolynomialRegression_degree_3,-0.0272,-2.8424,0.1047,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,XRP/USDT - Buy and Hold,-0.0042,-0.4921,0.6713,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,ZRX/USDT - Buy and Hold,0.0090,0.9095,0.4591,No,Pairwise t-test
+DASH/USDT - PolynomialRegression_degree_3,ZRX/USDT - MLPRegressor,0.0090,0.9095,0.4591,No,Pairwise t-test
+EOS/USDT - Buy and Hold,ETC/USDT - Buy and Hold,0.0202,0.9275,0.4516,No,Pairwise t-test
+EOS/USDT - Buy and Hold,ETH/USDT - Buy and Hold,0.0315,1.4573,0.2824,No,Pairwise t-test
+EOS/USDT - Buy and Hold,LTC/USDT - Buy and Hold,0.0150,0.6842,0.5645,No,Pairwise t-test
+EOS/USDT - Buy and Hold,LTC/USDT - PolynomialRegression_degree_3,0.0150,0.6842,0.5645,No,Pairwise t-test
+EOS/USDT - Buy and Hold,XMR/USDT - Buy and Hold,-0.0132,-0.5893,0.6153,No,Pairwise t-test
+EOS/USDT - Buy and Hold,XMR/USDT - LinearRegression,-0.0132,-0.5893,0.6153,No,Pairwise t-test
+EOS/USDT - Buy and Hold,XMR/USDT - MLPRegressor,-0.0132,-0.5893,0.6153,No,Pairwise t-test
+EOS/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_2,-0.0132,-0.5893,0.6153,No,Pairwise t-test
+EOS/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_3,-0.0132,-0.5893,0.6153,No,Pairwise t-test
+EOS/USDT - Buy and Hold,XRP/USDT - Buy and Hold,0.0099,0.4531,0.6949,No,Pairwise t-test
+EOS/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,0.0231,1.0276,0.4122,No,Pairwise t-test
+EOS/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0231,1.0276,0.4122,No,Pairwise t-test
+ETC/USDT - Buy and Hold,ETH/USDT - Buy and Hold,0.0114,6.3236,0.0241,Yes,Pairwise t-test
+ETC/USDT - Buy and Hold,LTC/USDT - Buy and Hold,-0.0052,-1.3235,0.3167,No,Pairwise t-test
+ETC/USDT - Buy and Hold,LTC/USDT - PolynomialRegression_degree_3,-0.0052,-1.3235,0.3167,No,Pairwise t-test
+ETC/USDT - Buy and Hold,XMR/USDT - Buy and Hold,-0.0333,-5.8502,0.0280,Yes,Pairwise t-test
+ETC/USDT - Buy and Hold,XMR/USDT - LinearRegression,-0.0333,-5.8502,0.0280,Yes,Pairwise t-test
+ETC/USDT - Buy and Hold,XMR/USDT - MLPRegressor,-0.0333,-5.8502,0.0280,Yes,Pairwise t-test
+ETC/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_2,-0.0333,-5.8502,0.0280,Yes,Pairwise t-test
+ETC/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_3,-0.0333,-5.8502,0.0280,Yes,Pairwise t-test
+ETC/USDT - Buy and Hold,XRP/USDT - Buy and Hold,-0.0103,-2.9660,0.0974,No,Pairwise t-test
+ETC/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,0.0029,0.4674,0.6862,No,Pairwise t-test
+ETC/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0029,0.4674,0.6862,No,Pairwise t-test
+ETH/USDT - Buy and Hold,LTC/USDT - Buy and Hold,-0.0166,-4.7951,0.0408,Yes,Pairwise t-test
+ETH/USDT - Buy and Hold,LTC/USDT - PolynomialRegression_degree_3,-0.0166,-4.7951,0.0408,Yes,Pairwise t-test
+ETH/USDT - Buy and Hold,XMR/USDT - Buy and Hold,-0.0447,-8.2764,0.0143,Yes,Pairwise t-test
+ETH/USDT - Buy and Hold,XMR/USDT - LinearRegression,-0.0447,-8.2764,0.0143,Yes,Pairwise t-test
+ETH/USDT - Buy and Hold,XMR/USDT - MLPRegressor,-0.0447,-8.2764,0.0143,Yes,Pairwise t-test
+ETH/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_2,-0.0447,-8.2764,0.0143,Yes,Pairwise t-test
+ETH/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_3,-0.0447,-8.2764,0.0143,Yes,Pairwise t-test
+ETH/USDT - Buy and Hold,XRP/USDT - Buy and Hold,-0.0216,-7.3348,0.0181,Yes,Pairwise t-test
+ETH/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,-0.0084,-1.3965,0.2974,No,Pairwise t-test
+ETH/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,-0.0084,-1.3965,0.2974,No,Pairwise t-test
+LTC/USDT - Buy and Hold,LTC/USDT - PolynomialRegression_degree_3,0.0000,0.0000,1.0000,No,Pairwise t-test
+LTC/USDT - Buy and Hold,XMR/USDT - Buy and Hold,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - Buy and Hold,XMR/USDT - LinearRegression,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - Buy and Hold,XMR/USDT - MLPRegressor,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_2,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_3,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - Buy and Hold,XRP/USDT - Buy and Hold,-0.0051,-1.1235,0.3780,No,Pairwise t-test
+LTC/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,0.0081,1.1630,0.3648,No,Pairwise t-test
+LTC/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0081,1.1630,0.3648,No,Pairwise t-test
+LTC/USDT - PolynomialRegression_degree_3,XMR/USDT - Buy and Hold,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - PolynomialRegression_degree_3,XMR/USDT - LinearRegression,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - PolynomialRegression_degree_3,XMR/USDT - MLPRegressor,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - PolynomialRegression_degree_3,XMR/USDT - PolynomialRegression_degree_2,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - PolynomialRegression_degree_3,XMR/USDT - PolynomialRegression_degree_3,-0.0281,-4.3929,0.0481,Yes,Pairwise t-test
+LTC/USDT - PolynomialRegression_degree_3,XRP/USDT - Buy and Hold,-0.0051,-1.1235,0.3780,No,Pairwise t-test
+LTC/USDT - PolynomialRegression_degree_3,ZRX/USDT - Buy and Hold,0.0081,1.1630,0.3648,No,Pairwise t-test
+LTC/USDT - PolynomialRegression_degree_3,ZRX/USDT - MLPRegressor,0.0081,1.1630,0.3648,No,Pairwise t-test
+XMR/USDT - Buy and Hold,XMR/USDT - LinearRegression,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - Buy and Hold,XMR/USDT - MLPRegressor,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_2,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - Buy and Hold,XMR/USDT - PolynomialRegression_degree_3,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - Buy and Hold,XRP/USDT - Buy and Hold,0.0231,3.7460,0.0645,No,Pairwise t-test
+XMR/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - LinearRegression,XMR/USDT - MLPRegressor,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - LinearRegression,XMR/USDT - PolynomialRegression_degree_2,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - LinearRegression,XMR/USDT - PolynomialRegression_degree_3,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - LinearRegression,XRP/USDT - Buy and Hold,0.0231,3.7460,0.0645,No,Pairwise t-test
+XMR/USDT - LinearRegression,ZRX/USDT - Buy and Hold,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - LinearRegression,ZRX/USDT - MLPRegressor,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - MLPRegressor,XMR/USDT - PolynomialRegression_degree_2,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - MLPRegressor,XMR/USDT - PolynomialRegression_degree_3,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - MLPRegressor,XRP/USDT - Buy and Hold,0.0231,3.7460,0.0645,No,Pairwise t-test
+XMR/USDT - MLPRegressor,ZRX/USDT - Buy and Hold,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - MLPRegressor,ZRX/USDT - MLPRegressor,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - PolynomialRegression_degree_2,XMR/USDT - PolynomialRegression_degree_3,0.0000,0.0000,1.0000,No,Pairwise t-test
+XMR/USDT - PolynomialRegression_degree_2,XRP/USDT - Buy and Hold,0.0231,3.7460,0.0645,No,Pairwise t-test
+XMR/USDT - PolynomialRegression_degree_2,ZRX/USDT - Buy and Hold,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - PolynomialRegression_degree_2,ZRX/USDT - MLPRegressor,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - PolynomialRegression_degree_3,XRP/USDT - Buy and Hold,0.0231,3.7460,0.0645,No,Pairwise t-test
+XMR/USDT - PolynomialRegression_degree_3,ZRX/USDT - Buy and Hold,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XMR/USDT - PolynomialRegression_degree_3,ZRX/USDT - MLPRegressor,0.0362,4.4701,0.0466,Yes,Pairwise t-test
+XRP/USDT - Buy and Hold,ZRX/USDT - Buy and Hold,0.0132,1.9611,0.1889,No,Pairwise t-test
+XRP/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0132,1.9611,0.1889,No,Pairwise t-test
+ZRX/USDT - Buy and Hold,ZRX/USDT - MLPRegressor,0.0000,0.0000,1.0000,No,Pairwise t-test

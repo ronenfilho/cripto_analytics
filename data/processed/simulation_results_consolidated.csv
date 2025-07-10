@@ -1,51 +1,51 @@
 symbol,strategy,initial_value,final_value,return_pct
-BCH/USDT,LinearRegression,1000.0,1173.79,0.1738
-BCH/USDT,MLPRegressor,1000.0,1222.0,0.222
-BCH/USDT,PolynomialRegression_degree_2,1000.0,1157.54,0.1575
-BCH/USDT,PolynomialRegression_degree_3,1000.0,1222.0,0.222
-BCH/USDT,Buy and Hold,1000.0,1101.86,0.1019
-BTC/USDT,LinearRegression,1000.0,1016.44,0.0164
-BTC/USDT,MLPRegressor,1000.0,1016.44,0.0164
-BTC/USDT,PolynomialRegression_degree_2,1000.0,1016.44,0.0164
-BTC/USDT,PolynomialRegression_degree_3,1000.0,1017.61,0.0176
-BTC/USDT,Buy and Hold,1000.0,1003.99,0.004
-DASH/USDT,LinearRegression,1000.0,897.29,-0.1027
-DASH/USDT,MLPRegressor,1000.0,909.62,-0.0904
-DASH/USDT,PolynomialRegression_degree_2,1000.0,974.87,-0.0251
-DASH/USDT,PolynomialRegression_degree_3,1000.0,921.03,-0.079
-DASH/USDT,Buy and Hold,1000.0,909.62,-0.0904
-EOS/USDT,LinearRegression,1000.0,920.5,-0.0795
-EOS/USDT,MLPRegressor,1000.0,920.5,-0.0795
-EOS/USDT,PolynomialRegression_degree_2,1000.0,920.5,-0.0795
-EOS/USDT,PolynomialRegression_degree_3,1000.0,931.77,-0.0682
-EOS/USDT,Buy and Hold,1000.0,862.37,-0.1376
-ETC/USDT,LinearRegression,1000.0,957.66,-0.0423
-ETC/USDT,MLPRegressor,1000.0,932.32,-0.0677
-ETC/USDT,PolynomialRegression_degree_2,1000.0,932.32,-0.0677
-ETC/USDT,PolynomialRegression_degree_3,1000.0,932.32,-0.0677
-ETC/USDT,Buy and Hold,1000.0,911.57,-0.0884
-ETH/USDT,LinearRegression,1000.0,906.62,-0.0934
-ETH/USDT,MLPRegressor,1000.0,906.62,-0.0934
-ETH/USDT,PolynomialRegression_degree_2,1000.0,906.62,-0.0934
-ETH/USDT,PolynomialRegression_degree_3,1000.0,906.62,-0.0934
-ETH/USDT,Buy and Hold,1000.0,868.47,-0.1315
-LTC/USDT,LinearRegression,1000.0,973.38,-0.0266
-LTC/USDT,MLPRegressor,1000.0,945.93,-0.0541
-LTC/USDT,PolynomialRegression_degree_2,1000.0,973.38,-0.0266
-LTC/USDT,PolynomialRegression_degree_3,1000.0,948.54,-0.0515
-LTC/USDT,Buy and Hold,1000.0,931.47,-0.0685
-XMR/USDT,LinearRegression,1000.0,1008.88,0.0089
-XMR/USDT,MLPRegressor,1000.0,1008.88,0.0089
-XMR/USDT,PolynomialRegression_degree_2,1000.0,1008.88,0.0089
-XMR/USDT,PolynomialRegression_degree_3,1000.0,1008.88,0.0089
-XMR/USDT,Buy and Hold,1000.0,967.94,-0.0321
-XRP/USDT,LinearRegression,1000.0,994.49,-0.0055
-XRP/USDT,MLPRegressor,1000.0,988.86,-0.0111
-XRP/USDT,PolynomialRegression_degree_2,1000.0,994.49,-0.0055
-XRP/USDT,PolynomialRegression_degree_3,1000.0,994.49,-0.0055
-XRP/USDT,Buy and Hold,1000.0,942.05,-0.0579
-ZRX/USDT,LinearRegression,1000.0,935.37,-0.0646
-ZRX/USDT,MLPRegressor,1000.0,876.85,-0.1232
-ZRX/USDT,PolynomialRegression_degree_2,1000.0,935.37,-0.0646
-ZRX/USDT,PolynomialRegression_degree_3,1000.0,904.87,-0.0951
-ZRX/USDT,Buy and Hold,1000.0,878.03,-0.122
+BCH/USDT,LinearRegression,1000.0,1000.0,0.0
+BCH/USDT,MLPRegressor,1000.0,1000.0,0.0
+BCH/USDT,PolynomialRegression_degree_2,1000.0,986.15,-0.0138
+BCH/USDT,PolynomialRegression_degree_3,1000.0,1000.0,0.0
+BCH/USDT,Buy and Hold,1000.0,939.91,-0.0601
+BTC/USDT,LinearRegression,1000.0,1042.98,0.043
+BTC/USDT,MLPRegressor,1000.0,1042.98,0.043
+BTC/USDT,PolynomialRegression_degree_2,1000.0,1042.98,0.043
+BTC/USDT,PolynomialRegression_degree_3,1000.0,1042.98,0.043
+BTC/USDT,Buy and Hold,1000.0,1050.05,0.05
+DASH/USDT,LinearRegression,1000.0,944.78,-0.0552
+DASH/USDT,MLPRegressor,1000.0,944.78,-0.0552
+DASH/USDT,PolynomialRegression_degree_2,1000.0,1000.0,0.0
+DASH/USDT,PolynomialRegression_degree_3,1000.0,944.78,-0.0552
+DASH/USDT,Buy and Hold,1000.0,944.78,-0.0552
+EOS/USDT,LinearRegression,1000.0,1007.65,0.0077
+EOS/USDT,MLPRegressor,1000.0,1007.65,0.0077
+EOS/USDT,PolynomialRegression_degree_2,1000.0,1007.65,0.0077
+EOS/USDT,PolynomialRegression_degree_3,1000.0,1007.65,0.0077
+EOS/USDT,Buy and Hold,1000.0,971.76,-0.0282
+ETC/USDT,LinearRegression,1000.0,967.67,-0.0323
+ETC/USDT,MLPRegressor,1000.0,967.67,-0.0323
+ETC/USDT,PolynomialRegression_degree_2,1000.0,967.67,-0.0323
+ETC/USDT,PolynomialRegression_degree_3,1000.0,967.67,-0.0323
+ETC/USDT,Buy and Hold,1000.0,932.94,-0.0671
+ETH/USDT,LinearRegression,1000.0,954.37,-0.0456
+ETH/USDT,MLPRegressor,1000.0,954.37,-0.0456
+ETH/USDT,PolynomialRegression_degree_2,1000.0,954.37,-0.0456
+ETH/USDT,PolynomialRegression_degree_3,1000.0,954.37,-0.0456
+ETH/USDT,Buy and Hold,1000.0,911.05,-0.0889
+LTC/USDT,LinearRegression,1000.0,967.56,-0.0324
+LTC/USDT,MLPRegressor,1000.0,967.56,-0.0324
+LTC/USDT,PolynomialRegression_degree_2,1000.0,967.56,-0.0324
+LTC/USDT,PolynomialRegression_degree_3,1000.0,942.87,-0.0571
+LTC/USDT,Buy and Hold,1000.0,942.87,-0.0571
+XMR/USDT,LinearRegression,1000.0,998.32,-0.0017
+XMR/USDT,MLPRegressor,1000.0,998.32,-0.0017
+XMR/USDT,PolynomialRegression_degree_2,1000.0,998.32,-0.0017
+XMR/USDT,PolynomialRegression_degree_3,1000.0,998.32,-0.0017
+XMR/USDT,Buy and Hold,1000.0,998.32,-0.0017
+XRP/USDT,LinearRegression,1000.0,973.21,-0.0268
+XRP/USDT,MLPRegressor,1000.0,1000.0,0.0
+XRP/USDT,PolynomialRegression_degree_2,1000.0,973.21,-0.0268
+XRP/USDT,PolynomialRegression_degree_3,1000.0,973.21,-0.0268
+XRP/USDT,Buy and Hold,1000.0,952.89,-0.0471
+ZRX/USDT,LinearRegression,1000.0,956.92,-0.0431
+ZRX/USDT,MLPRegressor,1000.0,927.29,-0.0727
+ZRX/USDT,PolynomialRegression_degree_2,1000.0,956.92,-0.0431
+ZRX/USDT,PolynomialRegression_degree_3,1000.0,956.92,-0.0431
+ZRX/USDT,Buy and Hold,1000.0,927.29,-0.0727
