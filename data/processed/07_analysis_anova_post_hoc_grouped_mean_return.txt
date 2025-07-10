@@ -8,18 +8,18 @@ Objetivo: Identificar quais grupos diferem significativamente entre si
 
 GRUPOS FORMADOS:
 ----------------------------------------
-Baixo Retorno: BCH/USDT - Buy and Hold, DASH/USDT - Buy and Hold, DASH/USDT - LinearRegression, DASH/USDT - MLPRegressor, DASH/USDT - PolynomialRegression_degree_3, ETC/USDT - Buy and Hold, ETH/USDT - Buy and Hold, LTC/USDT - Buy and Hold, LTC/USDT - PolynomialRegression_degree_3, ZRX/USDT - Buy and Hold, ZRX/USDT - MLPRegressor
-Alto Retorno: BTC/USDT - Buy and Hold, EOS/USDT - Buy and Hold, XMR/USDT - Buy and Hold, XMR/USDT - LinearRegression, XMR/USDT - MLPRegressor, XMR/USDT - PolynomialRegression_degree_2, XMR/USDT - PolynomialRegression_degree_3, XRP/USDT - Buy and Hold
+Alto Retorno: BCH/USDT - Buy and Hold, BCH/USDT - LinearRegression, BCH/USDT - MLPRegressor, BCH/USDT - PolynomialRegression_degree_2, BCH/USDT - PolynomialRegression_degree_3, BTC/USDT - Buy and Hold, BTC/USDT - LinearRegression, BTC/USDT - MLPRegressor, BTC/USDT - PolynomialRegression_degree_2, BTC/USDT - PolynomialRegression_degree_3, DASH/USDT - PolynomialRegression_degree_2, ETC/USDT - LinearRegression, LTC/USDT - Buy and Hold, LTC/USDT - LinearRegression, LTC/USDT - PolynomialRegression_degree_2, XMR/USDT - Buy and Hold, XMR/USDT - LinearRegression, XMR/USDT - MLPRegressor, XMR/USDT - PolynomialRegression_degree_2, XMR/USDT - PolynomialRegression_degree_3, XRP/USDT - Buy and Hold, XRP/USDT - LinearRegression, XRP/USDT - MLPRegressor, XRP/USDT - PolynomialRegression_degree_2, XRP/USDT - PolynomialRegression_degree_3
+Baixo Retorno: DASH/USDT - Buy and Hold, DASH/USDT - LinearRegression, DASH/USDT - MLPRegressor, DASH/USDT - PolynomialRegression_degree_3, EOS/USDT - Buy and Hold, EOS/USDT - LinearRegression, EOS/USDT - MLPRegressor, EOS/USDT - PolynomialRegression_degree_2, EOS/USDT - PolynomialRegression_degree_3, ETC/USDT - Buy and Hold, ETC/USDT - MLPRegressor, ETC/USDT - PolynomialRegression_degree_2, ETC/USDT - PolynomialRegression_degree_3, ETH/USDT - Buy and Hold, ETH/USDT - LinearRegression, ETH/USDT - MLPRegressor, ETH/USDT - PolynomialRegression_degree_2, ETH/USDT - PolynomialRegression_degree_3, LTC/USDT - MLPRegressor, LTC/USDT - PolynomialRegression_degree_3, ZRX/USDT - Buy and Hold, ZRX/USDT - LinearRegression, ZRX/USDT - MLPRegressor, ZRX/USDT - PolynomialRegression_degree_2, ZRX/USDT - PolynomialRegression_degree_3
 
 COMPARAÇÕES PAREADAS:
 ----------------------------------------
-COMPARAÇÃO 1: Baixo Retorno vs Alto Retorno
+COMPARAÇÃO 1: Alto Retorno vs Baixo Retorno
 ------------------------------------------------------------
-Diferença de Média: -0.0301
-Estatística t: -6.8116
+Diferença de Média: 0.0180
+Estatística t: 5.6150
 Valor p: 0.0000
 Resultado: SIGNIFICATIVO
-Interpretação: Baixo Retorno tem retorno médio MENOR que Alto Retorno
+Interpretação: Alto Retorno tem retorno médio MAIOR que Baixo Retorno
 
 ================================================================================
 RESUMO DA ANÁLISE POST HOC:
@@ -30,7 +30,7 @@ Comparações não significativas: 0
 
 DIFERENÇAS SIGNIFICATIVAS ENCONTRADAS:
 --------------------------------------------------
-• Baixo Retorno < Alto Retorno (p = 0.0000)
+• Alto Retorno > Baixo Retorno (p = 0.0000)
 
 ================================================================================
 Análise concluída com sucesso
