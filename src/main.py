@@ -53,7 +53,7 @@ def parse_args():
         "--analysis",
         action="store_true",
         help="(5) Executa a analise estastística dos dados (Teste de Hitótese e Analise da Variância)",
-    )    
+    )
     parser.add_argument("--days", type=int, help="Quantidade de dias para a simulação")
     parser.add_argument("--capital", type=float, help="Capital inicial para simulação")
     parser.add_argument(
@@ -133,14 +133,16 @@ def main():
             analysis_main()
 
         # Verifica se argumentos foram passados, caso contrário, processa todos
-        if not any([args.data, args.features, args.model, args.simulate, args.analysis]):
+        if not any(
+            [args.data, args.features, args.model, args.simulate, args.analysis]
+        ):
             logging.info(
                 "Nenhum argumento fornecido do pipeline. Processando todas as etapas do pipeline..."
             )
             data_load_main()
             features_main()
             models, data_calculate = models_main()
-            simulate_main(data_calculate, models=models)                        
+            simulate_main(data_calculate, models=models)
             analysis_main()
 
         logging.info("Pipeline concluído com sucesso.")

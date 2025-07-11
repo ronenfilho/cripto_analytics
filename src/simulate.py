@@ -8,10 +8,15 @@ import sys
 import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import SYMBOLS_TO_SIMULATE, INITIAL_CAPITAL, TEST_PERIOD_DAYS, PROCESSED_DATA 
+from src.config import (
+    SYMBOLS_TO_SIMULATE,
+    INITIAL_CAPITAL,
+    TEST_PERIOD_DAYS,
+    PROCESSED_DATA,
+)
 from src.utils import (
     timing,
-    filter_symbols,    
+    filter_symbols,
     calculate_correlation_coefficients,
     calculate_standard_error_between_mlp_and_best,
     determine_best_equation,
@@ -125,7 +130,6 @@ def run_investment_simulation(
     )
 
 
-
 def run_simulation_core(
     models: dict,
     X_sim: pd.DataFrame,
@@ -139,7 +143,7 @@ def run_simulation_core(
 ) -> dict:
     """
     Executa o core da simulação de investimento para todos os modelos.
-    
+
     Args:
         models (dict): Dicionário com os modelos treinados
         X_sim (pd.DataFrame): Features para simulação
@@ -150,14 +154,13 @@ def run_simulation_core(
         initial_capital (float): Capital inicial
         symbol_to_simulate (str): Símbolo da criptomoeda
         test_period_days (int): Período de teste em dias
-    
+
     Returns:
         dict: Resultados da simulação incluindo dados diários e consolidados
     """
     models_evolution_data = {}
     strategy_results = []
     daily_returns = []
-    
 
     # Calcula previsões e evolução do capital para cada modelo
     predictions = {}
@@ -172,26 +175,26 @@ def run_simulation_core(
         capital_evolution = simulate_returns(
             y_test_sim, y_pred_walk_forward, initial_capital
         )
-        
+
         # Armazena dados para uso posterior
         models_evolution_data[name] = {
             "capital_evolution": capital_evolution,
-            "predictions": y_pred_walk_forward
+            "predictions": y_pred_walk_forward,
         }
-        
+
         # Calcula retornos diários para este modelo
         y_test_values = y_test_sim.values
         current_capital = initial_capital
-        
+
         for i in range(len(y_test_values) - 1):
             date = dates_test_sim.iloc[i]
             current_price = y_test_values[i]
             next_price = y_test_values[i + 1]
             predicted_price = y_pred_walk_forward[i]
-            
+
             # Verifica se deve investir (previsão > preço atual)
             investment_made = "Yes" if predicted_price > current_price else "No"
-            
+
             # Calcula retorno baseado na decisão de investir
             if investment_made == "Yes":
                 return_pct = (next_price - current_price) / current_price
@@ -207,31 +210,37 @@ def run_simulation_core(
                 capital_after = current_capital  # Capital permanece igual
                 capital_gained = 0.0
                 # current_capital permanece igual
-            
-            daily_returns.append({
-                "date": date,
+
+            daily_returns.append(
+                {
+                    "date": date,
+                    "symbol": symbol_to_simulate,
+                    "strategy": name,
+                    "current_price": round(current_price, 2),
+                    "predicted_price": round(predicted_price, 2),
+                    "next_price": round(next_price, 2),
+                    "investment_made": investment_made,
+                    "capital_before": round(capital_before, 2),
+                    "capital_invested": round(capital_invested, 2),
+                    "capital_after": round(capital_after, 2),
+                    "capital_gained": round(capital_gained, 2),
+                    "return_pct": round(return_pct, 4),
+                }
+            )
+
+        # Adiciona aos resultados da estratégia
+        strategy_results.append(
+            {
                 "symbol": symbol_to_simulate,
                 "strategy": name,
-                "current_price": round(current_price, 2),
-                "predicted_price": round(predicted_price, 2),
-                "next_price": round(next_price, 2),
-                "investment_made": investment_made,
-                "capital_before": round(capital_before, 2),
-                "capital_invested": round(capital_invested, 2),
-                "capital_after": round(capital_after, 2),
-                "capital_gained": round(capital_gained, 2),
-                "return_pct": round(return_pct, 4)
-            })
-        
-        # Adiciona aos resultados da estratégia
-        strategy_results.append({
-            "symbol": symbol_to_simulate,
-            "strategy": name,
-            "initial_value": initial_capital,
-            "final_value": round(current_capital, 2),
-            "return_pct": round((current_capital - initial_capital) / initial_capital, 4)
-        })
-        
+                "initial_value": initial_capital,
+                "final_value": round(current_capital, 2),
+                "return_pct": round(
+                    (current_capital - initial_capital) / initial_capital, 4
+                ),
+            }
+        )
+
         logger.info(f"Capital final com {name}: U${current_capital:.2f}")
 
     # Estratégia "Buy and Hold"
@@ -239,43 +248,51 @@ def run_simulation_core(
     hold_evolution = [
         initial_capital * (price / y_test_values[0]) for price in y_test_values
     ]
-    
+
     # Adiciona dados diários para Buy and Hold
     for i in range(len(y_test_values) - 1):
         date = dates_test_sim.iloc[i]
         current_price = y_test_values[i]
         next_price = y_test_values[i + 1]
-        
+
         return_pct = (next_price - current_price) / current_price
         capital_before = hold_evolution[i]
         capital_after = hold_evolution[i + 1]
         capital_invested = capital_before
         capital_gained = capital_after - capital_before
-        
-        daily_returns.append({
-            "date": date,
+
+        daily_returns.append(
+            {
+                "date": date,
+                "symbol": symbol_to_simulate,
+                "strategy": "Buy and Hold",
+                "current_price": round(current_price, 2),
+                "predicted_price": round(
+                    current_price, 2
+                ),  # Buy and Hold não faz previsão
+                "next_price": round(next_price, 2),
+                "investment_made": "Yes",  # Buy and Hold sempre investe
+                "capital_before": round(capital_before, 2),
+                "capital_invested": round(capital_invested, 2),
+                "capital_after": round(capital_after, 2),
+                "capital_gained": round(capital_gained, 2),
+                "return_pct": round(return_pct, 4),
+            }
+        )
+
+    # Adiciona Buy and Hold aos resultados
+    bayes_houd_results = [
+        {
             "symbol": symbol_to_simulate,
             "strategy": "Buy and Hold",
-            "current_price": round(current_price, 2),
-            "predicted_price": round(current_price, 2),  # Buy and Hold não faz previsão
-            "next_price": round(next_price, 2),
-            "investment_made": "Yes",  # Buy and Hold sempre investe
-            "capital_before": round(capital_before, 2),
-            "capital_invested": round(capital_invested, 2),
-            "capital_after": round(capital_after, 2),
-            "capital_gained": round(capital_gained, 2),
-            "return_pct": round(return_pct, 4)
-        })
-    
-    # Adiciona Buy and Hold aos resultados
-    bayes_houd_results = [{
-        "symbol": symbol_to_simulate,
-        "strategy": "Buy and Hold",
-        "initial_value": initial_capital,
-        "final_value": round(hold_evolution[-1], 2),
-        "return_pct": round((hold_evolution[-1] - initial_capital) / initial_capital, 4)
-    }]
-    
+            "initial_value": initial_capital,
+            "final_value": round(hold_evolution[-1], 2),
+            "return_pct": round(
+                (hold_evolution[-1] - initial_capital) / initial_capital, 4
+            ),
+        }
+    ]
+
     logger.info(f"Capital final com Buy and Hold: U${hold_evolution[-1]:.2f}")
 
     # Certifica-se de que os DataFrames estão definidos antes de salvar
@@ -305,6 +322,7 @@ def run_simulation_core(
         "strategy_results": strategy_results,
         "daily_returns": daily_returns,
     }
+
 
 def main(data: pd.DataFrame = None, models: dict = None) -> None:
     """Função principal para executar o fluxo de simulação de investimento e análise de modelos."""

@@ -60,6 +60,7 @@ def plot_scatter_diagram(
     # plt.show()
     plt.close()
 
+
 def plot_investment_simulation(
     models: dict,
     predictions: dict,
@@ -74,7 +75,7 @@ def plot_investment_simulation(
 ) -> None:
     """
     Cria o gráfico da simulação de investimento.
-    
+
     Args:
         models (dict): Dicionário com os modelos treinados
         predictions (dict): Previsões pré-calculadas para os modelos
@@ -89,7 +90,7 @@ def plot_investment_simulation(
     """
     plt.style.use("seaborn-v0_8-darkgrid")
     fig, ax = plt.subplots(figsize=(14, 8))
-    
+
     # Plota cada modelo usando previsões pré-calculadas
     for name, y_pred_walk_forward in predictions.items():
         sorted_idx = np.argsort(dates_test_sim.values)
@@ -98,7 +99,7 @@ def plot_investment_simulation(
         capital_evolution = simulate_returns(
             y_test_sim, y_pred_walk_forward, initial_capital
         )
-        
+
         ax.plot(dates_test_sim, capital_evolution, label=f"Estratégia {name}")
 
     # Estratégia "Buy and Hold"
@@ -342,7 +343,7 @@ def plot_price_trends_by_month_year(data: pd.DataFrame) -> None:
         plt.ylabel("Preço de Fechamento")
         plt.legend()
         plt.xticks(rotation=45, ha="right", fontsize=10)
-        plt.grid(axis="y", linestyle="--", alpha=0.7)        
+        plt.grid(axis="y", linestyle="--", alpha=0.7)
         plt.tight_layout()
         plt.savefig(f"figures/{sanitized_symbol}_price_trends_month_year.png", dpi=150)
         plt.close()

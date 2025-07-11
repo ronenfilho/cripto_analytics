@@ -16,6 +16,7 @@ from src.config import USE_TIMING, LOG_LEVEL, PROCESSED_DATA
 # Configura o logger
 logger = logging.getLogger(__name__)
 
+
 def timing(func: callable) -> callable:
     """
     Decorator para medir o tempo de execução de uma função.
@@ -42,6 +43,7 @@ def timing(func: callable) -> callable:
             return func(*args, **kwargs)
 
     return wrapper
+
 
 @timing
 def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
@@ -73,7 +75,6 @@ def compare_variability(data: pd.DataFrame) -> pd.DataFrame:
     return variability
 
 
-
 @timing
 def simulate_returns(
     y_test: pd.Series, y_pred: np.ndarray, initial_capital: float = 1000.0
@@ -99,6 +100,7 @@ def simulate_returns(
     )
 
     return capital_evolution.tolist()
+
 
 def setup_logging():
     # Define o nível de logging a partir do .env
@@ -226,9 +228,10 @@ def get_current_datetime() -> str:
 
     return datetime.datetime.now().strftime("%Y%m%d_%H%M")
 
+
 def delete_simulation_files():
     """Deleta os arquivos de resultados de simulação, se existirem."""
-    
+
     files_to_delete = [
         os.path.join(PROCESSED_DATA, "simulation_results_consolidated.csv"),
         os.path.join(PROCESSED_DATA, "simulation_results_days.csv"),
@@ -240,6 +243,7 @@ def delete_simulation_files():
             print(f"Arquivo deletado: {file_path}")
         else:
             print(f"Arquivo não encontrado: {file_path}")
+
 
 if __name__ == "__main__":
     setup_logging()

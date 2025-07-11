@@ -65,5 +65,7 @@ FIGURE_SIZE_HEIGHT = float(os.getenv("FIGURE_SIZE_HEIGHT", "8"))
 # Configurações avançadas de análise
 CROSS_VALIDATION_FOLDS = int(os.getenv("CROSS_VALIDATION_FOLDS", "5"))
 PRIMARY_METRIC = os.getenv("PRIMARY_METRIC", "rmse").lower()
-ANOVA_GROUPING_CRITERIA = os.getenv("ANOVA_GROUPING_CRITERIA", "volatility,mean_return").split(",")
+ANOVA_GROUPING_CRITERIA = os.getenv(
+    "ANOVA_GROUPING_CRITERIA", "volatility,mean_return"
+).split(",")
 PERFORMANCE_THRESHOLD = float(os.getenv("PERFORMANCE_THRESHOLD", "0.5"))
