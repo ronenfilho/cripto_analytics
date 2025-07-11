@@ -1,6 +1,8 @@
 from src.features import calculate_summary_statistics
 import pandas as pd
 import subprocess
+import tempfile
+import os
 
 
 def test_calculate_summary_statistics():
@@ -9,8 +11,11 @@ def test_calculate_summary_statistics():
         {"symbol": ["BTC", "BTC", "ETH", "ETH"], "close": [100, 200, 300, 400]}
     )
 
-    # Executa a função
-    result = calculate_summary_statistics(data)
+    # Cria um arquivo temporário para salvar o resultado
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_file = os.path.join(temp_dir, "test_summary.csv")
+        # Executa a função com o arquivo temporário
+        result = calculate_summary_statistics(data, temp_file)
 
     # Verifica o resultado
     assert "mean" in result.columns

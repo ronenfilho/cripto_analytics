@@ -31,7 +31,7 @@ def plot_scatter_diagram(
     models: dict,
     X: pd.DataFrame,
     y: pd.Series,
-    save_path: str = "figures/scatter_diagram.png",
+    save_path: str = "figures/scatter_diagram_model.png",
 ) -> None:
     """
     Gera um diagrama de dispersão para todos os modelos.
