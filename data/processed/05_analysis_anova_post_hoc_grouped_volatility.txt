@@ -9,7 +9,7 @@ Objetivo: Identificar quais grupos diferem significativamente entre si
 RESULTADO:
 ----------------------------------------
 ANOVA não foi significativa - Teste post hoc não aplicável
-Razão: p-valor da ANOVA (0.8563) > 0.05
+Razão: p-valor da ANOVA (0.9683) > 0.05
 Conclusão: Não há diferenças significativas entre os grupos para justificar comparações pareadas
 
 
