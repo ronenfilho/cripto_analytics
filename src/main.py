@@ -87,9 +87,18 @@ def main():
 
         # Reimportar config após ajustes
         import importlib
-        import config
-
+        from src import config
+        
+        # Força o recarregamento do módulo config.py
         importlib.reload(config)
+        
+        # Recarrega as variáveis específicas que podem ter sido alteradas
+        if args.days:
+            config.TEST_PERIOD_DAYS = int(args.days)
+        if args.capital:
+            config.INITIAL_CAPITAL = float(args.capital)
+        if args.crypto:
+            config.SYMBOLS_TO_SIMULATE = args.crypto.split(",")
 
         from src.data_load import main as data_load_main
         from src.features import main as features_main

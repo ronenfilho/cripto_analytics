@@ -3,14 +3,18 @@ import os
 import sys
 import numpy as np
 from sklearn.base import clone
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.model_selection import KFold
 from sklearn.model_selection import TimeSeriesSplit
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, ElasticNet, Ridge, Lasso
 from sklearn.neural_network import MLPRegressor
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler, MinMaxScaler
 from sklearn.pipeline import make_pipeline
+from sklearn.svm import SVR
 import logging
+from joblib import dump, load
+import datetime
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.config import (
@@ -19,6 +23,7 @@ from src.config import (
     MODELS,
     POLYNOMIAL_DEGREE_RANGE,
     PROCESSED_FILE,
+    PROCESSED_DATA,
 )
 from src.features import calculate_features
 from src.utils import timing, filter_symbols, setup_logging
@@ -39,6 +44,9 @@ def walk_forward_prediction(
     """
     # Inicializa a lista para armazenar as previsões
     predictions = []
+    
+    # Armazena as previsões originais para debug e consistência
+    original_predictions = []
 
     # Configura o TimeSeriesSplit para o loop de validação
     n_splits = len(X) - min_train_size
@@ -64,6 +72,7 @@ def walk_forward_prediction(
         # Faz a previsão para o próximo dia e a armazena
         pred = model_clone.predict(X_test)[0]
         predictions.append(pred)
+        original_predictions.append(pred)  # Salva a previsão original
 
         # Verifica se a previsão indica compra (previsão maior que o preço atual)
         current_price = y.iloc[test_index[0]]
@@ -74,8 +83,8 @@ def walk_forward_prediction(
             next_price = y.iloc[test_index[0] + 1]
             if action == "Compra realizada":
                 # Aplica o retorno baseado no próximo preço
-                return_rate = next_price / current_price
-                accumulated_balance *= return_rate
+                return_rate = (next_price - current_price) / current_price
+                accumulated_balance *= (1 + return_rate)
             # Se não comprou, o saldo permanece igual
 
         # Imprime o status do progresso a cada 1 dia ou no último dia
@@ -204,6 +213,18 @@ def run_training_data() -> tuple[dict, pd.DataFrame]:
                 models[f"PolynomialRegression_degree_{degree}"] = make_pipeline(
                     PolynomialFeatures(degree), LinearRegression()
                 )
+        elif name == "ElasticNet":
+            models[name] = ElasticNet(random_state=42)
+        elif name == "Ridge":
+            models[name] = Ridge(random_state=42)
+        elif name == "Lasso":
+            models[name] = Lasso(random_state=42)
+        elif name == "RandomForestRegressor":
+            models[name] = RandomForestRegressor(random_state=42)
+        elif name == "GradientBoostingRegressor":
+            models[name] = GradientBoostingRegressor(random_state=42)
+        elif name == "SVR":
+            models[name] = SVR()
 
     results = []
 
@@ -217,6 +238,107 @@ def run_training_data() -> tuple[dict, pd.DataFrame]:
     logger.info(results_df)
 
     return models, data_calculate
+
+
+@timing
+def create_advanced_features(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cria features avançadas para melhorar a capacidade preditiva dos modelos.
+    
+    Args:
+        data (pd.DataFrame): DataFrame com dados de preço e features básicas
+        
+    Returns:
+        pd.DataFrame: DataFrame com features avançadas adicionadas
+    """
+    logger.info("Criando features avançadas para melhorar a previsão...")
+    
+    # Clone dos dados para evitar modificar o original
+    df = data.copy()
+    
+    # Organiza por símbolo e data
+    df = df.sort_values(['symbol', 'date'])
+    
+    # Agrupa por símbolo para calcular features específicas por moeda
+    result = []
+    
+    for symbol, group in df.groupby('symbol'):
+        # Ordena por data
+        group = group.sort_values('date')
+        
+        # Features técnicas avançadas
+        # RSI (Relative Strength Index) - 14 dias
+        delta = group['close'].diff()
+        gain = delta.clip(lower=0)
+        loss = -delta.clip(upper=0)
+        avg_gain = gain.rolling(window=14).mean()
+        avg_loss = loss.rolling(window=14).mean()
+        # Evita divisão por zero
+        rs = avg_gain / avg_loss.replace(0, 1e-9)
+        group['rsi_14'] = 100 - (100 / (1 + rs))
+        
+        # MACD (Moving Average Convergence Divergence)
+        ema12 = group['close'].ewm(span=12, adjust=False).mean()
+        ema26 = group['close'].ewm(span=26, adjust=False).mean()
+        group['macd'] = ema12 - ema26
+        group['macd_signal'] = group['macd'].ewm(span=9, adjust=False).mean()
+        group['macd_hist'] = group['macd'] - group['macd_signal']
+        
+        # Bollinger Bands
+        group['bb_middle'] = group['close'].rolling(window=20).mean()
+        bb_std = group['close'].rolling(window=20).std()
+        group['bb_upper'] = group['bb_middle'] + (bb_std * 2)
+        group['bb_lower'] = group['bb_middle'] - (bb_std * 2)
+        group['bb_width'] = (group['bb_upper'] - group['bb_lower']) / group['bb_middle']
+        group['bb_pct'] = (group['close'] - group['bb_lower']) / (group['bb_upper'] - group['bb_lower'])
+        
+        # Features de volume
+        group['volume_change'] = group['Volume USDT'].pct_change()
+        group['volume_ma10'] = group['Volume USDT'].rolling(window=10).mean()
+        group['volume_ma10_ratio'] = group['Volume USDT'] / group['volume_ma10']
+        
+        # Volatilidade em diferentes janelas
+        for window in [3, 5, 10, 20]:
+            group[f'volatility_{window}d'] = group['close'].pct_change().rolling(window=window).std()
+        
+        # Features de momentum em diferentes janelas
+        for window in [3, 5, 14, 21]:
+            group[f'momentum_{window}d'] = group['close'] - group['close'].shift(window)
+            group[f'return_{window}d'] = group['close'].pct_change(window)
+            group[f'mean_{window}d'] = group['close'].rolling(window=window).mean()
+            
+        # ROC (Rate of Change)
+        for window in [5, 10, 20]:
+            group[f'roc_{window}d'] = (group['close'] / group['close'].shift(window) - 1) * 100
+        
+        # Features de preço relativas a médias móveis
+        group['price_to_ma50'] = group['close'] / group['close'].rolling(window=50).mean()
+        group['price_to_ma200'] = group['close'] / group['close'].rolling(window=200).mean()
+        
+        # Cruzamentos de médias móveis (sinais de compra/venda)
+        ma_fast = group['close'].rolling(window=10).mean()
+        ma_slow = group['close'].rolling(window=30).mean()
+        group['ma_crossover'] = np.where(ma_fast > ma_slow, 1, -1)
+        
+        # Adiciona features cíclicas de tempo (dia da semana, mês, etc.)
+        dates = pd.to_datetime(group['date'])
+        group['day_of_week'] = dates.dt.dayofweek
+        group['day_of_week_sin'] = np.sin(2 * np.pi * group['day_of_week'] / 7)
+        group['day_of_week_cos'] = np.cos(2 * np.pi * group['day_of_week'] / 7)
+        group['month_sin'] = np.sin(2 * np.pi * dates.dt.month / 12)
+        group['month_cos'] = np.cos(2 * np.pi * dates.dt.month / 12)
+        
+        # Adiciona o grupo ao resultado
+        result.append(group)
+    
+    # Combina todos os grupos com as novas features
+    df_result = pd.concat(result)
+    
+    # Remove linhas com valores NaN (necessário devido aos cálculos de rolling window)
+    df_result = df_result.dropna()
+    
+    logger.info(f"Features avançadas criadas com sucesso. Total de features: {len(df_result.columns)}")
+    return df_result
 
 
 def main():

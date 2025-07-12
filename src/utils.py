@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error
 import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import USE_TIMING, LOG_LEVEL, PROCESSED_DATA
+from src import config
 
 
 # Configura o logger
@@ -24,7 +24,7 @@ def timing(func: callable) -> callable:
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        if USE_TIMING:
+        if config.USE_TIMING:
             print(f"{func.__name__} - Iniciando processamento...")
             start_time = time.time()
             try:
@@ -88,23 +88,29 @@ def simulate_returns(
     Returns:
         list: Lista contendo a evolução do capital ao longo do tempo, com base nos retornos simulados.
     """
-
-    capital_evolution = [initial_capital]
+    capital = initial_capital
     y_test_values = y_test.values
-
-    daily_returns = np.where(
-        y_pred[1:] > y_test_values[:-1], y_test_values[1:] / y_test_values[:-1], 1
-    )
-    capital_evolution = np.concatenate(
-        ([initial_capital], initial_capital * np.cumprod(daily_returns))
-    )
-
-    return capital_evolution.tolist()
+    capital_evolution = [initial_capital]
+    
+    for i in range(len(y_test_values) - 1):
+        current_price = y_test_values[i]
+        next_price = y_test_values[i + 1]
+        predicted_price = y_pred[i]
+        
+        # Verifica se deve investir (previsão > preço atual)
+        if predicted_price > current_price:
+            # Aplica o retorno baseado no próximo preço - usando a mesma fórmula que nos logs
+            return_rate = (next_price - current_price) / current_price
+            capital *= (1 + return_rate)
+        
+        capital_evolution.append(capital)
+    
+    return capital_evolution
 
 
 def setup_logging():
     # Define o nível de logging a partir do .env
-    log_level = getattr(logging, LOG_LEVEL.upper(), logging.INFO)
+    log_level = getattr(logging, config.LOG_LEVEL.upper(), logging.INFO)
 
     logging.basicConfig(
         level=log_level,
@@ -233,8 +239,8 @@ def delete_simulation_files():
     """Deleta os arquivos de resultados de simulação, se existirem."""
 
     files_to_delete = [
-        os.path.join(PROCESSED_DATA, "simulation_results_consolidated.csv"),
-        os.path.join(PROCESSED_DATA, "simulation_results_days.csv"),
+        os.path.join(config.PROCESSED_DATA, "simulation_results_consolidated.csv"),
+        os.path.join(config.PROCESSED_DATA, "simulation_results_days.csv"),
     ]
 
     for file_path in files_to_delete:

@@ -6,12 +6,8 @@ import sys
 import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.config import (
-    SYMBOLS_TO_SIMULATE,
-    INITIAL_CAPITAL,
-    TEST_PERIOD_DAYS,
-    PROCESSED_DATA,
-)
+# Importe o módulo config inteiro para ter acesso dinâmico às variáveis
+from src import config
 from src.utils import (
     timing,
     filter_symbols,
@@ -163,6 +159,8 @@ def run_simulation_core(
     # Calcula previsões e evolução do capital para cada modelo
     predictions = {}
     for name, model in models.items():
+        # Primeiro obtemos as previsões do modelo com walk_forward_prediction
+        logger.info(f"\nIniciando simulação para modelo {name}...")
         y_pred_walk_forward = walk_forward_prediction(
             model, X_sim, y_sim, min_train_size
         )
@@ -179,67 +177,59 @@ def run_simulation_core(
             "capital_evolution": capital_evolution,
             "predictions": y_pred_walk_forward,
         }
-
-        # Calcula retornos diários para este modelo
+        
+        # Calculamos os retornos diários com os mesmos valores
         y_test_values = y_test_sim.values
-        current_capital = initial_capital
-
+        daily_model_returns = []
+        
         for i in range(len(y_test_values) - 1):
-            date = dates_test_sim.iloc[i]
             current_price = y_test_values[i]
             next_price = y_test_values[i + 1]
             predicted_price = y_pred_walk_forward[i]
-
+            
             # Verifica se deve investir (previsão > preço atual)
             investment_made = "Yes" if predicted_price > current_price else "No"
-
-            # Calcula retorno baseado na decisão de investir
-            if investment_made == "Yes":
-                return_pct = (next_price - current_price) / current_price
-                capital_before = current_capital
-                capital_invested = capital_before
-                capital_after = capital_before * (1 + return_pct)
-                capital_gained = capital_after - capital_before
-                current_capital = capital_after  # Atualiza o capital para o próximo dia
-            else:
-                return_pct = 0.0  # Sem investimento, sem retorno
-                capital_before = current_capital
-                capital_invested = 0.0
-                capital_after = current_capital  # Capital permanece igual
-                capital_gained = 0.0
-                # current_capital permanece igual
-
-            daily_returns.append(
-                {
-                    "date": date,
-                    "symbol": symbol_to_simulate,
-                    "strategy": name,
-                    "current_price": round(current_price, 2),
-                    "predicted_price": round(predicted_price, 2),
-                    "next_price": round(next_price, 2),
-                    "investment_made": investment_made,
-                    "capital_before": round(capital_before, 2),
-                    "capital_invested": round(capital_invested, 2),
-                    "capital_after": round(capital_after, 2),
-                    "capital_gained": round(capital_gained, 2),
-                    "return_pct": round(return_pct, 4),
-                }
-            )
-
-        # Adiciona aos resultados da estratégia
-        strategy_results.append(
-            {
+            
+            # Usa o valor da capital_evolution para garantir consistência
+            capital_before = capital_evolution[i]
+            capital_after = capital_evolution[i+1]
+            
+            # Calcula o ganho e retorno
+            capital_gained = capital_after - capital_before
+            return_pct = (next_price - current_price) / current_price if investment_made == "Yes" else 0.0
+            
+            daily_model_returns.append({
+                "date": dates_test_sim.iloc[i],
                 "symbol": symbol_to_simulate,
                 "strategy": name,
-                "initial_value": initial_capital,
-                "final_value": round(current_capital, 2),
-                "return_pct": round(
-                    (current_capital - initial_capital) / initial_capital, 4
-                ),
-            }
-        )
+                "current_price": round(current_price, 2),
+                "predicted_price": round(predicted_price, 2),
+                "next_price": round(next_price, 2),
+                "investment_made": investment_made,
+                "capital_before": round(capital_before, 2),
+                "capital_invested": round(capital_before, 2) if investment_made == "Yes" else 0.0,
+                "capital_after": round(capital_after, 2),
+                "capital_gained": round(capital_gained, 2),
+                "return_pct": round(return_pct, 4),
+            })
+        
+        # Adiciona todos os retornos diários deste modelo
+        daily_returns.extend(daily_model_returns)
+        
+        # Valor final para o CSV - garantindo que seja o mesmo do gráfico e dos logs
+        final_value = capital_evolution[-1]
+        logger.info(f"Capital final com {name}: U${final_value:.2f}")
+        
+        # Adiciona aos resultados da estratégia
+        strategy_results.append({
+            "symbol": symbol_to_simulate,
+            "strategy": name,
+            "initial_value": initial_capital,
+            "final_value": round(final_value, 2),
+            "return_pct": round((final_value - initial_capital) / initial_capital, 4),
+        })
 
-        logger.info(f"Capital final com {name}: U${current_capital:.2f}")
+        logger.info(f"Capital final com {name}: U${capital_evolution[-1]:.2f}")
 
     # Estratégia "Buy and Hold"
     y_test_values = y_test_sim.values
@@ -299,7 +289,7 @@ def run_simulation_core(
 
     # Salva os retornos diários em um arquivo CSV no modo append
     returns_df["symbol"] = symbol_to_simulate  # Adiciona a coluna do símbolo
-    returns_file = os.path.join(PROCESSED_DATA, "simulation_results_days.csv")
+    returns_file = os.path.join(config.PROCESSED_DATA, "simulation_results_days.csv")
     if not os.path.exists(returns_file):
         returns_df.to_csv(returns_file, index=False)
     else:
@@ -308,7 +298,7 @@ def run_simulation_core(
 
     # Salva o arquivo combinado no modo append
     combined_results["symbol"] = symbol_to_simulate  # Adiciona a coluna do símbolo
-    output_file = os.path.join(PROCESSED_DATA, "simulation_results_consolidated.csv")
+    output_file = os.path.join(config.PROCESSED_DATA, "simulation_results_consolidated.csv")
     if not os.path.exists(output_file):
         combined_results.to_csv(output_file, index=False)
     else:
@@ -341,7 +331,7 @@ def main(data: pd.DataFrame = None, models: dict = None) -> None:
     delete_simulation_files()
 
     # Itera sobre cada símbolo para realizar a simulação
-    for symbol in SYMBOLS_TO_SIMULATE:
+    for symbol in config.SYMBOLS_TO_SIMULATE:
         logger.info(f"Iniciando simulação para {symbol}")
         filtered_data = filter_symbols(data, [symbol])
 
@@ -349,8 +339,8 @@ def main(data: pd.DataFrame = None, models: dict = None) -> None:
             data=filtered_data,
             symbol_to_simulate=symbol,
             models=models,
-            initial_capital=INITIAL_CAPITAL,
-            test_period_days=TEST_PERIOD_DAYS,
+            initial_capital=config.INITIAL_CAPITAL,
+            test_period_days=config.TEST_PERIOD_DAYS,
         )
 
     # --- PARTE 3: Análise dos Modelos ---
