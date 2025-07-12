@@ -77,9 +77,6 @@ def main():
     try:
         logging.info("Executando o pipeline de análise de criptomoedas...")
 
-        env_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"
-        )
         # Atualizar variáveis no .env dinamicamente se fornecidas
         if args.crypto:
             update_env_variable("SYMBOLS", str(args.crypto))

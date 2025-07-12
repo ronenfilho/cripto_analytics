@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 from scipy.stats import ttest_1samp, f_oneway, ttest_ind
-from pathlib import Path
 import csv
 from typing import List, Dict
 import logging
@@ -396,9 +395,9 @@ def save_anova_individual_cryptocurrencies(
         file.write("ANÁLISE ANOVA - CRIPTOMOEDAS INDIVIDUAIS\n")
         file.write("=" * 80 + "\n\n")
 
-        file.write(f"Tipo de Análise: ANOVA\n")
+        file.write("Tipo de Análise: ANOVA\n")
         file.write(
-            f"Descrição do Teste: Comparação de retornos médios diários entre criptomoedas individuais\n\n"
+            "Descrição do Teste: Comparação de retornos médios diários entre criptomoedas individuais\n\n"
         )
 
         file.write("CRIPTOMOEDAS ANALISADAS:\n")
@@ -534,9 +533,9 @@ def save_anova_grouped_cryptocurrencies(
         file.write("ANÁLISE ANOVA - GRUPOS DE CRIPTOMOEDAS\n")
         file.write("=" * 80 + "\n\n")
 
-        file.write(f"Tipo de Análise: ANOVA\n")
+        file.write("Tipo de Análise: ANOVA\n")
         file.write(
-            f"Descrição do Teste: Comparação de retornos médios diários entre grupos de criptomoedas\n"
+            "Descrição do Teste: Comparação de retornos médios diários entre grupos de criptomoedas\n"
         )
         file.write(
             f"Critério de Agrupamento: {anova_results['grouping_criterion']}\n\n"
@@ -598,9 +597,9 @@ def save_anova_post_hoc_grouped(
         file.write("=" * 80 + "\n\n")
 
         file.write(f"Critério de Agrupamento: {anova_results['grouping_criterion']}\n")
-        file.write(f"Método do Teste: Teste t pareado\n")
+        file.write("Método do Teste: Teste t pareado\n")
         file.write(
-            f"Objetivo: Identificar quais grupos diferem significativamente entre si\n\n"
+            "Objetivo: Identificar quais grupos diferem significativamente entre si\n\n"
         )
 
         if not anova_results['is_significant'] or not anova_results['post_hoc']:
